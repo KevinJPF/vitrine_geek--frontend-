@@ -1,0 +1,36 @@
+.input {
+  width: 100%;
+  padding: 0 12px;
+  border-radius: 200px;
+  color: var(--secondary);
+  font-family: "Karantina", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  border: 3px solid transparent;
+  outline: none;
+  transition: 0.2s ease-in-out;
+}
+
+.input:focus {
+  border-color: var(--highlight);
+  caret-color: var(--highlight);
+}
+
+.input:disabled {
+  color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.input_error,
+.input_error:focus {
+  border-color: var(--red);
+  caret-color: var(--red);
+}
+
+.input_ok,
+.input_ok:focus {
+  border-color: var(--primary);
+  caret-color: var(--primary);
+}

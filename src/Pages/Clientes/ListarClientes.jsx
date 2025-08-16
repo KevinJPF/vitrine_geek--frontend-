@@ -1,3 +1,4 @@
+import { Alert } from "bootstrap";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -30,27 +31,55 @@ const ListarClientes = () => {
     },
   ]);
 
+  const alterarStatusCliente = (clienteParaAlterar) => {
+    setClientes(
+      clientes.map((cliente) => {
+        if (cliente == clienteParaAlterar) cliente.ativo = !cliente.ativo;
+        return cliente;
+      })
+    );
+  };
+
   return (
     <div className="container d-flex flex-column min-vh-100">
-      <div
-        className="col-auto p-2 d-flex flex-row justify-content-center align-items-center"
-        style={{ borderBottom: "1px solid black" }}
-      >
+      <div className="col-auto p-2 d-flex flex-row justify-content-center align-items-center">
         <p className="m-0" style={{ color: "var(--highlight" }}>
           Clientes
         </p>
       </div>
-      <div className="col my-2 d-flex flex-column overflow-y-auto overflow-x-hidden gap-2 bg-bslack">
+      <div
+        className={`col my-2 px-3 rounded-4 d-flex flex-column gap-2 shadow`}
+        style={{ backgroundColor: "var(--primary)", color: "var(--white)" }}
+      >
+        <div className="row">
+          <div className="col">Nome</div>
+          <div className="col">Email</div>
+          <div className="col">CPF</div>
+          <div className="col">Ativo</div>
+          <div className="col-auto d-flex gap-2">Ação</div>
+        </div>
         {clientes.map((cliente) => {
           return (
-            <div className="row">
-              <div className="col ">nome: {cliente.nome}</div>
-              <div className="col">email: {cliente.email}</div>
-              <div className="col">cpf: {cliente.cpf}</div>
-              <div className="col">ativo: {cliente.ativo ? "✓" : "x"}</div>
-              <div className="col-auto d-flex gap-2">
+            <div
+              className="row py-2 px-3 rounded-pill"
+              style={{ backgroundColor: "#0000002f" }}
+            >
+              <div className="col">Nome: {cliente.nome}</div>
+              <div className="col">Email: {cliente.email}</div>
+              <div className="col">CPF: {cliente.cpf}</div>
+              <div className="col">
+                Ativo:{" "}
+                <span
+                  style={{
+                    color: cliente.ativo ? "var(--primary)" : "var(--red)",
+                  }}
+                >
+                  {cliente.ativo ? "✓" : "x"}
+                </span>
+              </div>
+              <div className="col-auto p-0 d-flex gap-2">
                 <button
-                  className="btn"
+                  className="btn btn-inverted"
                   onClick={() => {
                     navigate("/novo-cliente");
                   }}
@@ -58,12 +87,13 @@ const ListarClientes = () => {
                   Editar
                 </button>
                 <button
-                  className="btn btn-danger"
+                  className={`btn ${cliente.ativo && "btn-danger"}`}
                   onClick={() => {
-                    navigate("/novo-cliente");
+                    // Alert(`Remover cliente ${cliente.nome}?`);
+                    alterarStatusCliente(cliente);
                   }}
                 >
-                  Excluir
+                  {cliente.ativo ? "Desativar" : "Ativar"}
                 </button>
               </div>
             </div>
