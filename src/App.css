@@ -1,0 +1,45 @@
+.btn {
+  background-color: var(--primary);
+  color: var(--secondary);
+  padding: 0px 16px;
+  font-weight: bold;
+  border-radius: 200px;
+}
+
+.btn:hover {
+  background-color: var(--white);
+  color: var(--secondary);
+}
+
+.btn-inverted {
+  background-color: var(--secondary);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-inverted:hover {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
+.btn-danger {
+  background-color: var(--red);
+  color: var(--white);
+  border: 2px solid var(--red);
+}
+
+.btn-danger:hover {
+  background-color: transparent;
+  color: var(--red);
+}
+
+body {
+  background-color: var(--secondary);
+  color: #ffffff;
+}
+
+/* Estilo global do scroll (página inteira e qualquer elemento com overflow)  */
+* {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--white) var(--secondary); /* cor da barra / cor do track */
+}

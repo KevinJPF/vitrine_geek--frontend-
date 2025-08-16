@@ -1,0 +1,10 @@
+.button {
+  background-color: bisque;
+  color: black;
+  transition: 0.2s;
+  border-radius: 16px;
+}
+
+.button:hover {
+  background-color: azure;
+}

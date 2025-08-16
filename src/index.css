@@ -1,0 +1,16 @@
+:root {
+  --primary: #1abc9c;
+  --secondary: #2c3e50;
+  --highlight: #f1c40f;
+  --red: #e91e63;
+  --white: #ffffff;
+
+  --font-button: 16px;
+  --font-button-weight: 500;
+}
+
+.roboto-light {
+  font-family: "Roboto", serif;
+  font-weight: 300;
+  font-style: normal;
+}
