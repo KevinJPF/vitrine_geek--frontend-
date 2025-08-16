@@ -33,6 +33,10 @@
   color: var(--red);
 }
 
+input {
+  border-radius: 200px;
+}
+
 body {
   background-color: var(--secondary);
   color: #ffffff;

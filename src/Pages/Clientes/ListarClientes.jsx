@@ -28,116 +28,19 @@ const ListarClientes = () => {
       cpf: "666.777.888-99",
       ativo: false,
     },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
-      ativo: false,
-    },
   ]);
 
   return (
     <div className="container d-flex flex-column min-vh-100">
-      <div className="col-auto p-2 d-flex flex-row justify-content-center align-items-center">
-        <p style={{ color: "var(--highlight" }}>Clientes</p>
+      <div
+        className="col-auto p-2 d-flex flex-row justify-content-center align-items-center"
+        style={{ borderBottom: "1px solid black" }}
+      >
+        <p className="m-0" style={{ color: "var(--highlight" }}>
+          Clientes
+        </p>
       </div>
-      <div className="col d-flex flex-column overflow-y-auto overflow-x-hidden gap-2 bg-bslack">
+      <div className="col my-2 d-flex flex-column overflow-y-auto overflow-x-hidden gap-2 bg-bslack">
         {clientes.map((cliente) => {
           return (
             <div className="row">
@@ -179,7 +82,7 @@ const ListarClientes = () => {
         <button
           className="btn"
           onClick={() => {
-            navigate("/novo-cliente");
+            navigate("/registrar-cliente");
           }}
         >
           Add
