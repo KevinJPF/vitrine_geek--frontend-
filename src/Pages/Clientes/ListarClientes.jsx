@@ -5,28 +5,57 @@ const ListarClientes = () => {
   const navigate = useNavigate();
   const [clientes, setClientes] = useState([
     {
-      nome: "Kevin",
-      email: "kevin@email.com",
-      cpf: "111.222.333-44",
+      nome: "João Silva",
+      genero: "Masculino",
+      cpf: "12345678901",
+      nascimento: "10/05/1990",
+      email: "joao.silva@email.com",
+      telefone: "11987654321",
+      senha: "123456",
       ativo: true,
+      enderecos: [
+        {
+          nome: "Casa",
+          logradouro: "Rua das Flores, 123",
+        },
+      ],
+      cartoes: [{ nomeCartao: "Nubank", numeroCartao: "1234-5678-9012-3456" }],
     },
     {
-      nome: "Karina",
-      email: "karina@email.com",
-      cpf: "444.333.222-11",
+      nome: "Maria Oliveira",
+      genero: "Feminino",
+      cpf: "98765432109",
+      nascimento: "22/11/1988",
+      email: "maria.oliveira@email.com",
+      telefone: "11999998888",
+      senha: "maria@123",
       ativo: true,
+      enderecos: [
+        {
+          nome: "Apartamento",
+          logradouro: "Av. Central, 456",
+        },
+      ],
+      cartoes: [
+        { nomeCartao: "Santander", numeroCartao: "4444-3333-2222-1111" },
+      ],
     },
     {
-      nome: "Pedro",
-      email: "pedro@email.com",
-      cpf: "999.888.777-66",
-      ativo: true,
-    },
-    {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      cpf: "666.777.888-99",
+      nome: "Pedro Costa",
+      genero: "Masculino",
+      cpf: "45678912300",
+      nascimento: "03/03/1995",
+      email: "pedro.costa@email.com",
+      telefone: "11955554444",
+      senha: "pedro@99",
       ativo: false,
+      enderecos: [
+        {
+          nome: "Casa",
+          logradouro: "Rua José Alves, 89",
+        },
+      ],
+      cartoes: [{ nomeCartao: "Itaú", numeroCartao: "8888-7777-6666-5555" }],
     },
   ]);
 
@@ -131,7 +160,7 @@ const ListarClientes = () => {
             navigate("/");
           }}
         >
-          Back
+          Voltar
         </button>
         <button
           className="btn"

@@ -32,7 +32,7 @@ const RegistrarCliente = () => {
     email: (cliente && cliente.email) ?? "",
     telefone: (cliente && cliente.telefone) ?? "",
     senha: (cliente && cliente.senha) ?? "",
-    ativo: true,
+    ativo: (cliente && cliente.ativo) ?? true,
     enderecos: (cliente && cliente.enderecos) ?? [
       { nome: "Casa", logradouro: "José Dantas 131" },
     ],
@@ -77,16 +77,12 @@ const RegistrarCliente = () => {
     cartao: {},
   });
 
-  const [senhaParaConfirmar, setSenhaParaConfirmar] = useState("");
+  const [senhaParaConfirmar, setSenhaParaConfirmar] = useState(
+    (cliente && cliente.senha) ?? ""
+  );
   const [mostrarPopupEnderecos, setMostrarPopupEnderecos] = useState(false);
   const [mostrarPopupCartoes, setMostrarPopupCartoes] = useState(false);
   const [mostrarAlertaErro, setMostrarAlertaErro] = useState(false);
-  // #endregion
-
-  // #region useEffects
-  useEffect(() => {
-    console.log(dadosCliente);
-  }, [dadosCliente]);
   // #endregion
 
   // #region Funcoes
@@ -171,8 +167,6 @@ const RegistrarCliente = () => {
         enderecos: [...dadosCliente.enderecos, novoEndereco],
       });
       setMostrarPopupEnderecos(false);
-    } else {
-      // setMostrarAlertaErro(true);
     }
   };
 
@@ -220,8 +214,6 @@ const RegistrarCliente = () => {
         cartoes: [...dadosCliente.cartoes, novoCartao],
       });
       setMostrarPopupCartoes(false);
-    } else {
-      // setMostrarAlertaErro(true);
     }
   };
 
