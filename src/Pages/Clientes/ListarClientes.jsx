@@ -1,5 +1,4 @@
-import { Alert } from "bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 const ListarClientes = () => {
@@ -40,6 +39,27 @@ const ListarClientes = () => {
     );
   };
 
+  useEffect(() => {
+    const novoCliente = localStorage.getItem("novoCliente");
+    const editcliente = localStorage.getItem("editCliente");
+    const index = localStorage.getItem("indexCliente");
+
+    if (editcliente && index !== null) {
+      setClientes((old) => {
+        const updated = [...old];
+        updated[index] = JSON.parse(editcliente);
+        return updated;
+      });
+      localStorage.removeItem("editCliente");
+      localStorage.removeItem("indexCliente");
+    }
+
+    if (novoCliente) {
+      setClientes((old) => [...old, JSON.parse(novoCliente)]);
+      localStorage.removeItem("novoCliente");
+    }
+  }, []);
+
   return (
     <div className="container d-flex flex-column min-vh-100">
       <div className="col-auto p-2 d-flex flex-row justify-content-center align-items-center">
@@ -58,9 +78,10 @@ const ListarClientes = () => {
           <div className="col">Ativo</div>
           <div className="col-auto d-flex gap-2">Ação</div>
         </div>
-        {clientes.map((cliente) => {
+        {clientes.map((cliente, index) => {
           return (
             <div
+              key={index}
               className="row py-2 px-3 rounded-pill"
               style={{ backgroundColor: "#0000002f" }}
             >
@@ -81,7 +102,10 @@ const ListarClientes = () => {
                 <button
                   className="btn btn-inverted"
                   onClick={() => {
-                    navigate("/novo-cliente");
+                    localStorage.setItem("indexCliente", index);
+                    navigate("/registrar-cliente", {
+                      state: { cliente },
+                    });
                   }}
                 >
                   Editar
@@ -111,11 +135,11 @@ const ListarClientes = () => {
         </button>
         <button
           className="btn"
-          onClick={() => {
+          onClick={async () => {
             navigate("/registrar-cliente");
           }}
         >
-          Add
+          Adicionar
         </button>
       </div>
     </div>

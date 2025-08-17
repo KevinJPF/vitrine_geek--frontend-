@@ -5,7 +5,9 @@
   border-radius: 8px;
   cursor: pointer;
   user-select: none;
+  width: 20%;
   transition: 0.2s ease-in-out;
+  box-shadow: 2px 2px 4px #0000004f;
 }
 
 .endereco_card:hover,
@@ -13,6 +15,12 @@
 .add_card {
   background-color: var(--highlight);
   color: var(--secondary);
+}
+
+.add_card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .endereco_card:active,

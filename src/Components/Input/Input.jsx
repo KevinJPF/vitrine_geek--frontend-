@@ -2,12 +2,26 @@ import Styles from "./input.module.css";
 
 const Input = ({
   value = "",
+  isOnlyNumbers = false,
   onChange = () => {},
   onFocus = () => {},
-  onBlue = () => {},
+  onBlur = () => {},
+  maxLength,
   isPassword = false,
   isCorrect = null,
 }) => {
+  const handleChange = (e) => {
+    let val = e.target.value;
+
+    if (isOnlyNumbers) {
+      // remove tudo que não for número e salva na variável
+      val = val.replace(/\D/g, "");
+    }
+
+    // chama o onChange passando o valor já filtrado
+    onChange(val);
+  };
+
   return (
     <div className="col-12 p-0">
       <input
@@ -17,9 +31,10 @@ const Input = ({
         } shadow`}
         type={isPassword ? "password" : "text"}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onFocus={onFocus}
-        onBlur={onBlue}
+        onBlur={onBlur}
+        maxLength={maxLength}
       />
     </div>
   );

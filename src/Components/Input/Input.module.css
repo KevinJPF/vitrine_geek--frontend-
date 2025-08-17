@@ -31,6 +31,6 @@
 
 .input_ok,
 .input_ok:focus {
-  border-color: var(--primary);
-  caret-color: var(--primary);
+  border-color: var(--green);
+  caret-color: var(--green);
 }
