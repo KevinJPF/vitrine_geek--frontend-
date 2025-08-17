@@ -601,7 +601,7 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Input
                   value={novoEndereco.tipoResidencia}
-                  isCorrect={validacaoCampos.endereco.nomeEndereco}
+                  isCorrect={validacaoCampos.endereco.tipoResidencia}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
@@ -616,7 +616,7 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Input
                   value={novoEndereco.tipoLogradouro}
-                  isCorrect={validacaoCampos.endereco.nomeEndereco}
+                  isCorrect={validacaoCampos.endereco.tipoLogradouro}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
