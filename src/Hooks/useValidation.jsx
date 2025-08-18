@@ -75,6 +75,13 @@ export default function useValidation() {
     );
   };
 
+  // Senha deve ter: 8+ caracteres, letra maiúscula, letra minúscula e caractere especial
+  const validatePassword = (value) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
+
+    return regex.test(value);
+  };
+
   return {
     validateRequired,
     validateCPF,
@@ -83,5 +90,6 @@ export default function useValidation() {
     validateCEP,
     validateCreditCard,
     validateDate,
+    validatePassword,
   };
 }

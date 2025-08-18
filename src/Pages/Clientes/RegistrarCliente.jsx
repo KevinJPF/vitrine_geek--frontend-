@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import styles from "./Clientes.module.css";
-import Input from "../../Components/Input/Input";
+import Input, { MasksEnum } from "../../Components/Input/Input";
 import PopupModal from "../../Components/PopupModal/PopupModal";
 import SwitchButton from "../../Components/SwitchButton/SwitchButton";
 import useValidation from "../../Hooks/useValidation";
@@ -22,6 +22,7 @@ const RegistrarCliente = () => {
     validateCEP,
     validateCreditCard,
     validateDate,
+    validatePassword,
   } = useValidation();
 
   const { state } = useLocation();
@@ -104,9 +105,7 @@ const RegistrarCliente = () => {
     email: null,
     telefone: null,
     senha: null,
-    endereco: null,
     endereco: {},
-    carta: null,
     cartao: {},
   });
 
@@ -304,7 +303,8 @@ const RegistrarCliente = () => {
     }
     if (
       !compararSenha(dadosCliente.senha, senhaParaConfirmar) ||
-      dadosCliente.senha.length <= 0
+      dadosCliente.senha.length <= 0 ||
+      !validatePassword(dadosCliente.senha)
     ) {
       camposInvalidos.senha = false;
       isInvalido = true;
@@ -389,10 +389,9 @@ const RegistrarCliente = () => {
                 <div className="row">
                   <Input
                     type="text"
-                    isOnlyNumbers={true}
+                    maskType={MasksEnum.CPF}
                     value={dadosCliente.cpf}
                     isCorrect={validacaoCampos.cpf}
-                    maxLength={11}
                     onChange={(value) => {
                       setDadosCliente({ ...dadosCliente, cpf: value });
                     }}
@@ -409,6 +408,7 @@ const RegistrarCliente = () => {
                 <div className="row">
                   <Input
                     type="text"
+                    maskType={MasksEnum.DATE}
                     value={dadosCliente.nascimento}
                     isCorrect={validacaoCampos.nascimento}
                     onChange={(value) => {
@@ -506,8 +506,7 @@ const RegistrarCliente = () => {
                 <div className="row">
                   <Input
                     type="text"
-                    isOnlyNumbers={true}
-                    maxLength={11}
+                    maskType={MasksEnum.PHONE}
                     value={dadosCliente.telefone}
                     isCorrect={validacaoCampos.telefone}
                     onChange={(value) => {
@@ -900,6 +899,7 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Input
                   value={novoEndereco.cep}
+                  maskType={MasksEnum.CEP}
                   isCorrect={validacaoCampos.endereco.cep}
                   onChange={(value) => {
                     setNovoEndereco({
@@ -934,7 +934,7 @@ const RegistrarCliente = () => {
             </div>
             <div className="col">
               <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                Estado:
+                UF:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
                 </span>
@@ -943,6 +943,7 @@ const RegistrarCliente = () => {
                 <Input
                   value={novoEndereco.estado}
                   isCorrect={validacaoCampos.endereco.estado}
+                  maxLength={2}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
@@ -1025,6 +1026,8 @@ const RegistrarCliente = () => {
                 <Input
                   value={novoEndereco.numero}
                   isCorrect={validacaoCampos.endereco.numero}
+                  isOnlyNumbers={true}
+                  maxLength={10}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
@@ -1134,6 +1137,7 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Input
                   value={novoCartao.numeroCartao}
+                  maskType={MasksEnum.CREDIT_CARD}
                   isOnlyNumbers={true}
                   maxLength={16}
                   isCorrect={validacaoCampos.cartao.numeroCartao}
@@ -1179,6 +1183,8 @@ const RegistrarCliente = () => {
                 <Input
                   value={novoCartao.codigoSeguranca}
                   isCorrect={validacaoCampos.cartao.codigoSeguranca}
+                  isOnlyNumbers={true}
+                  maxLength={3}
                   onChange={(value) => {
                     setNovoCartao({
                       ...novoCartao,

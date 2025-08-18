@@ -274,7 +274,7 @@ const ListarClientes = () => {
                   {cliente.cpf}
                 </div>
                 <div
-                  className="col-2 d-flex justify-content-center"
+                  className="col-2 label d-flex justify-content-center"
                   style={{
                     color: cliente.ativo ? "var(--green)" : "var(--red)",
                     borderRight: "2px solid var(--secondary)",
