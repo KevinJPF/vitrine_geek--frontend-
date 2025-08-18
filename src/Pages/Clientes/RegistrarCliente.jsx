@@ -84,7 +84,7 @@ const RegistrarCliente = () => {
     numero: "",
     logradouro: "",
     observacoes: "",
-    isCobranca: false,
+    isCobranca: true,
     isEntrega: false,
     isFavorito: false,
   });
@@ -359,7 +359,12 @@ const RegistrarCliente = () => {
           <div className="row px-3 pb-3">
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2">Nome:</div>
+                <div className="row label ps-2">
+                  Nome:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     type="text"
@@ -375,7 +380,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">CPF:</div>
+                <div className="row label ps-2">
+                  CPF:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     type="text"
@@ -390,7 +400,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">Data Nasc.:</div>
+                <div className="row label ps-2">
+                  Data Nasc.:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     type="text"
@@ -406,7 +421,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-auto p-0">
-                <div className="row label ps-2">Gênero:</div>
+                <div className="row label ps-2">
+                  Gênero:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Dropdown className="p-0">
                     <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -450,7 +470,12 @@ const RegistrarCliente = () => {
             </div>
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2">Email:</div>
+                <div className="row label ps-2">
+                  Email:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     type="text"
@@ -472,7 +497,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">Telefone:</div>
+                <div className="row label ps-2">
+                  Telefone:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     type="text"
@@ -490,7 +520,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2">Senha:</div>
+                <div className="row label ps-2">
+                  Senha:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     value={dadosCliente.senha}
@@ -521,7 +556,12 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2">Confirmar Senha:</div>
+                <div className="row label ps-2">
+                  Confirmar Senha:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
                 <div className="row">
                   <Input
                     value={senhaParaConfirmar}
@@ -640,7 +680,11 @@ const RegistrarCliente = () => {
               className={`col-auto ${styles.add_card}`}
               style={{ minHeight: "75px" }}
               onClick={() => {
-                setNovoEndereco({});
+                setNovoEndereco({
+                  isCobranca: true,
+                  isEntrega: false,
+                  isFavorito: false,
+                });
                 setValidacaoCampos({ ...validacaoCampos, endereco: {} });
                 setMostrarPopupEnderecos(true);
               }}
@@ -787,7 +831,12 @@ const RegistrarCliente = () => {
         <div className="col d-flex flex-column gap-3">
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">Nome:</div>
+              <div className="row label ps-2">
+                Nome:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.nomeEndereco}
@@ -802,7 +851,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Tipo de Residência:</div>
+              <div className="row label ps-2">
+                Tipo de Residência:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.tipoResidencia}
@@ -817,7 +871,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Tipo de Logradouro:</div>
+              <div className="row label ps-2">
+                Tipo de Logradouro:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.tipoLogradouro}
@@ -832,7 +891,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">CEP:</div>
+              <div className="row label ps-2">
+                CEP:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.cep}
@@ -849,7 +913,12 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">País:</div>
+              <div className="row label ps-2">
+                País:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.pais}
@@ -864,7 +933,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Estado:</div>
+              <div className="row label ps-2">
+                Estado:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.estado}
@@ -879,7 +953,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Cidade:</div>
+              <div className="row label ps-2">
+                Cidade:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.cidade}
@@ -894,7 +973,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Bairro:</div>
+              <div className="row label ps-2">
+                Bairro:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.bairro}
@@ -911,7 +995,12 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">Logradouro:</div>
+              <div className="row label ps-2">
+                Logradouro:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.logradouro}
@@ -926,7 +1015,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Número:</div>
+              <div className="row label ps-2">
+                Número:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoEndereco.numero}
@@ -966,6 +1060,7 @@ const RegistrarCliente = () => {
                 setNovoEndereco({
                   ...novoEndereco,
                   isCobranca: !novoEndereco.isCobranca,
+                  isEntrega: true,
                 });
               }}
             />
@@ -976,6 +1071,7 @@ const RegistrarCliente = () => {
                 setNovoEndereco({
                   ...novoEndereco,
                   isEntrega: !novoEndereco.isEntrega,
+                  isCobranca: true,
                 });
               }}
             />
@@ -1009,7 +1105,12 @@ const RegistrarCliente = () => {
         >
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">Nome do Cartão:</div>
+              <div className="row label ps-2">
+                Nome do Cartão:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row ">
                 <Input
                   value={novoCartao.nomeCartao}
@@ -1024,7 +1125,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Número do Cartão:</div>
+              <div className="row label ps-2">
+                Número do Cartão:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoCartao.numeroCartao}
@@ -1043,7 +1149,12 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">Nome Impresso no Cartão:</div>
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
+                Nome Impresso no Cartão:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoCartao.nomeImpresso}
@@ -1058,7 +1169,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Código de Segurança:</div>
+              <div className="row label ps-2">
+                Código de Segurança:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Input
                   value={novoCartao.codigoSeguranca}
@@ -1073,7 +1189,12 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col-auto p-0">
-              <div className="row label ps-2">Bandeira do Cartão:</div>
+              <div className="row label ps-2">
+                Bandeira do Cartão:
+                <span className="col ps-1" style={{ color: "var(--red)" }}>
+                  *
+                </span>
+              </div>
               <div className="row">
                 <Dropdown className="col p-0">
                   <Dropdown.Toggle variant="success" id="dropdown-basic">
