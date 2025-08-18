@@ -36,11 +36,40 @@ const RegistrarCliente = () => {
     senha: (cliente && cliente.senha) ?? "",
     ativo: (cliente && cliente.ativo) ?? true,
     enderecos: (cliente && cliente.enderecos) ?? [
-      { nome: "Casa", logradouro: "José Dantas 131" },
+      {
+        nomeEndereco: "Casa dos Pais",
+        tipoResidencia: "Casa",
+        tipoLogradouro: "Travessa",
+        cep: "34567-890",
+        pais: "Brasil",
+        estado: "MG",
+        cidade: "Belo Horizonte",
+        bairro: "Savassi",
+        numero: "89",
+        logradouro: "Travessa da Serra",
+        observacoes: "Cachorro bravo no portão",
+        isCobranca: true,
+        isEntrega: false,
+        isFavorito: false,
+      },
     ],
     cartoes: (cliente && cliente.cartoes) ?? [
-      { nomeCartao: "Nubank", numeroCartao: "1234-1234-1234-1234" },
-      { nomeCartao: "Santander", numeroCartao: "4321-4321-4321-4321" },
+      {
+        nomeCartao: "Cartão Pessoal",
+        numeroCartao: "4111111111111111",
+        nomeImpresso: "KEVIN J P FRANCISCO",
+        bandeira: "Visa",
+        codigoSeguranca: "123",
+        isFavorito: true,
+      },
+      {
+        nomeCartao: "Cartão Nubank",
+        numeroCartao: "5274838273827483",
+        nomeImpresso: "KEVIN JULIANO",
+        bandeira: "Mastercard",
+        codigoSeguranca: "321",
+        isFavorito: false,
+      },
     ],
   });
   const [novoEndereco, setNovoEndereco] = useState({
