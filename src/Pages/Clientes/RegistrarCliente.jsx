@@ -104,7 +104,9 @@ const RegistrarCliente = () => {
     email: null,
     telefone: null,
     senha: null,
+    endereco: null,
     endereco: {},
+    carta: null,
     cartao: {},
   });
 
@@ -307,6 +309,14 @@ const RegistrarCliente = () => {
       camposInvalidos.senha = false;
       isInvalido = true;
     }
+    if (dadosCliente.enderecos.length <= 0) {
+      camposInvalidos.endereco = false;
+      isInvalido = true;
+    }
+    if (dadosCliente.cartoes.length <= 0) {
+      camposInvalidos.cartao = false;
+      isInvalido = true;
+    }
     setValidacaoCampos({ ...validacaoCampos, camposInvalidos });
     return !isInvalido;
   };
@@ -329,22 +339,24 @@ const RegistrarCliente = () => {
       <div className="container d-flex flex-column min-vh-100">
         <div className="col-auto p-2 d-flex flex-row justify-content-center align-items-center">
           <p className="m-0" style={{ color: "var(--highlight)" }}>
-            Novo Cliente
+            {cliente ? "Editar" : "Novo"} Cliente
           </p>
         </div>
         <div
-          className={`col my-2 px-3 pb-2 rounded-4 d-flex flex-column gap-2 shadow`}
+          className={`col my-2 pb-2 rounded-4 d-flex flex-column gap-2 shadow overflow-hidden`}
           style={{ backgroundColor: "var(--primary)", color: "var(--white)" }}
         >
           <div
-            className="row label justify-content-center"
+            className="row justify-content-center"
             style={{
-              borderBottom: "2px solid var(--highlight)",
+              backgroundColor: "var(--highlight)",
+              borderBottom: "2px solid var(--secondary)",
+              color: "var(--secondary)",
             }}
           >
             Dados Pessoais
           </div>
-          <div className="row">
+          <div className="row px-3 pb-3">
             <div className="row gap-2">
               <div className="col-3 p-0">
                 <div className="row label ps-2">Nome:</div>
@@ -538,14 +550,23 @@ const RegistrarCliente = () => {
             </div>
           </div>
           <div
-            className="row label justify-content-center"
+            className="row justify-content-center"
             style={{
-              borderBottom: "2px solid var(--highlight)",
+              backgroundColor: "var(--highlight)",
+              borderBottom: `2px solid ${
+                validacaoCampos.endereco == false
+                  ? "var(--red)"
+                  : "var(--secondary)"
+              }`,
+              color:
+                validacaoCampos.endereco == false
+                  ? "var(--red)"
+                  : "var(--secondary)",
             }}
           >
             Endereços
           </div>
-          <div className="row overflow-x-auto overflow-y-hidden pb-1 gap-2">
+          <div className="row px-3 overflow-x-auto overflow-y-hidden pb-1 gap-2">
             {dadosCliente.enderecos.map((endereco, index) => (
               <div
                 key={index}
@@ -628,14 +649,23 @@ const RegistrarCliente = () => {
             </div>
           </div>
           <div
-            className="row label justify-content-center"
+            className="row justify-content-center"
             style={{
-              borderBottom: "2px solid var(--highlight)",
+              backgroundColor: "var(--highlight)",
+              borderBottom: `2px solid ${
+                validacaoCampos.cartao == false
+                  ? "var(--red)"
+                  : "var(--secondary)"
+              }`,
+              color:
+                validacaoCampos.cartao == false
+                  ? "var(--red)"
+                  : "var(--secondary)",
             }}
           >
             Cartões
           </div>
-          <div className="row overflow-x-auto overflow-y-hidden pb-1 gap-2">
+          <div className="row px-3 overflow-x-auto overflow-y-hidden pb-1 gap-2">
             {dadosCliente.cartoes.map((cartao, index) => (
               <div
                 key={index}
@@ -711,17 +741,23 @@ const RegistrarCliente = () => {
               +
             </div>
           </div>
-          <div className="row">
+          <div className="row px-3">
             {mostrarAlertaErro && (
               <Alert variant={"danger"}>
-                Os campos em vermelho estão com valores inválidos.
+                Os campos (
+                {Object.entries(validacaoCampos)
+                  .filter((campo) => campo[1] == false)
+                  .map((campo, index) => {
+                    return `${index > 0 ? ", " : ""}${campo[0]}`;
+                  })}
+                ) estão com valores inválidos.
               </Alert>
             )}
           </div>
         </div>
         <div className="col-auto d-flex justify-content-end gap-2 py-2">
           <button
-            className="btn btn-inverted"
+            className="btn btn-outline"
             onClick={() => {
               navigate(-1);
             }}

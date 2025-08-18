@@ -9,7 +9,7 @@ const Home = () => {
       </div>
       <div className="col">
         <button
-          className="btn btn-inverted"
+          className="btn btn-outline"
           onClick={() => {
             navigate("/clientes");
           }}

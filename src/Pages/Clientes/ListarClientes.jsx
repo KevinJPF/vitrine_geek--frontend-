@@ -182,65 +182,138 @@ const ListarClientes = () => {
         </p>
       </div>
       <div
-        className={`col my-2 px-3 rounded-4 d-flex flex-column gap-2 shadow`}
-        style={{ backgroundColor: "var(--primary)", color: "var(--white)" }}
+        className={`col my-2 rounded-4 d-flex flex-column shadow`}
+        style={{
+          backgroundColor: "var(--primary)",
+          color: "var(--white)",
+        }}
       >
-        <div className="row">
-          <div className="col">Nome</div>
-          <div className="col">Email</div>
-          <div className="col">CPF</div>
-          <div className="col">Ativo</div>
-          <div className="col-auto d-flex gap-2">Ação</div>
+        <div
+          className="row"
+          style={{
+            backgroundColor: "var(--highlight)",
+            color: "var(--secondary)",
+            borderBottom: "2px solid var(--secondary)",
+            borderRadius: "16px 16px 0px 0px",
+          }}
+        >
+          <div
+            className="col-2 d-flex justify-content-center"
+            style={{
+              borderRight: "2px solid var(--highlight)",
+            }}
+          >
+            Nome
+          </div>
+          <div
+            className="col-3  d-flex justify-content-center"
+            style={{
+              borderRight: "2px solid var(--highlight)",
+            }}
+          >
+            Email
+          </div>
+          <div
+            className="col-2  d-flex justify-content-center"
+            style={{
+              borderRight: "2px solid var(--highlight)",
+            }}
+          >
+            CPF
+          </div>
+          <div
+            className="col-2  d-flex justify-content-center"
+            style={{
+              borderRight: "2px solid var(--highlight)",
+            }}
+          >
+            Ativo
+          </div>
+          <div className="col-3  d-flex justify-content-center">Ação</div>
         </div>
-        {clientes.map((cliente, index) => {
-          return (
-            <div
-              key={index}
-              className="row py-2 px-3 rounded-pill"
-              style={{ backgroundColor: "#0000002f" }}
-            >
-              <div className="col">Nome: {cliente.nome}</div>
-              <div className="col">Email: {cliente.email}</div>
-              <div className="col">CPF: {cliente.cpf}</div>
-              <div className="col">
-                Ativo:{" "}
-                <span
+        <div
+          className="col overflow-hidden"
+          style={{
+            // backgroundColor: "#0000001f",
+            borderRadius: "0px 0px 16px 16px",
+          }}
+        >
+          {clientes.map((cliente, index) => {
+            return (
+              <div
+                key={index}
+                className="row py-2"
+                style={{
+                  backgroundColor: index % 2 == 0 ? "#ffffff10" : "#ffffff1f",
+                  borderBottom: "2px solid var(--secondary)",
+                  color: "var(--secondary)",
+                }}
+              >
+                <div
+                  className="col-2"
                   style={{
-                    color: cliente.ativo ? "var(--primary)" : "var(--red)",
+                    borderRight: "2px solid var(--secondary)",
+                  }}
+                >
+                  {cliente.nome}
+                </div>
+                <div
+                  className="col-3"
+                  style={{
+                    borderRight: "2px solid var(--secondary)",
+                  }}
+                >
+                  {cliente.email}
+                </div>
+                <div
+                  className="col-2"
+                  style={{
+                    borderRight: "2px solid var(--secondary)",
+                  }}
+                >
+                  {cliente.cpf}
+                </div>
+                <div
+                  className="col-2 d-flex justify-content-center"
+                  style={{
+                    color: cliente.ativo ? "var(--green)" : "var(--red)",
+                    borderRight: "2px solid var(--secondary)",
                   }}
                 >
                   {cliente.ativo ? "✓" : "x"}
-                </span>
+                </div>
+                <div className="col-3 gap-2 d-flex justify-content-center">
+                  <button
+                    className="btn btn-inverted"
+                    onClick={() => {
+                      localStorage.setItem("indexCliente", index);
+                      navigate("/registrar-cliente", {
+                        state: { cliente },
+                      });
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className={`btn ${
+                      cliente.ativo ? "btn-danger" : "btn-green"
+                    }`}
+                    onClick={() => {
+                      // Alert(`Remover cliente ${cliente.nome}?`);
+                      alterarStatusCliente(cliente);
+                    }}
+                  >
+                    {cliente.ativo ? "Desativar" : "Ativar"}
+                  </button>
+                </div>
               </div>
-              <div className="col-auto p-0 d-flex gap-2">
-                <button
-                  className="btn btn-inverted"
-                  onClick={() => {
-                    localStorage.setItem("indexCliente", index);
-                    navigate("/registrar-cliente", {
-                      state: { cliente },
-                    });
-                  }}
-                >
-                  Editar
-                </button>
-                <button
-                  className={`btn ${cliente.ativo && "btn-danger"}`}
-                  onClick={() => {
-                    // Alert(`Remover cliente ${cliente.nome}?`);
-                    alterarStatusCliente(cliente);
-                  }}
-                >
-                  {cliente.ativo ? "Desativar" : "Ativar"}
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
       <div className="col-auto d-flex justify-content-between py-2">
         <button
-          className="btn btn-inverted"
+          className="btn btn-outline"
           onClick={() => {
             navigate("/");
           }}
