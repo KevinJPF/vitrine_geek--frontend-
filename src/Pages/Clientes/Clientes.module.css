@@ -29,3 +29,12 @@
   background-color: var(--white);
   color: var(--secondary);
 }
+
+.delete_icon {
+  transition: 0.2s;
+}
+.delete_icon:hover {
+  background-color: var(--white);
+  color: var(--red);
+  border-radius: 4px;
+}

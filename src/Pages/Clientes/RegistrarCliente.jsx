@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import Styles from "./Clientes.module.css";
+import styles from "./Clientes.module.css";
 import Input from "../../Components/Input/Input";
 import PopupModal from "../../Components/PopupModal/PopupModal";
 import SwitchButton from "../../Components/SwitchButton/SwitchButton";
 import useValidation from "../../Hooks/useValidation";
 import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const RegistrarCliente = () => {
   // #region Variaveis
@@ -162,10 +164,22 @@ const RegistrarCliente = () => {
 
   const salvarEndereco = async () => {
     if (await validarTodosCamposEndereco()) {
-      setDadosCliente({
-        ...dadosCliente,
-        enderecos: [...dadosCliente.enderecos, novoEndereco],
-      });
+      if (novoEndereco.index !== null) {
+        setDadosCliente((prev) => {
+          const updatedEnderecos = [...(prev.enderecos || [])];
+          updatedEnderecos[novoEndereco.index] = novoEndereco;
+
+          return {
+            ...prev,
+            enderecos: updatedEnderecos,
+          };
+        });
+      } else {
+        setDadosCliente({
+          ...dadosCliente,
+          enderecos: [...dadosCliente.enderecos, novoEndereco],
+        });
+      }
       setMostrarPopupEnderecos(false);
     }
   };
@@ -209,10 +223,22 @@ const RegistrarCliente = () => {
 
   const salvarCartao = async () => {
     if (await validarTodosCamposCartao()) {
-      setDadosCliente({
-        ...dadosCliente,
-        cartoes: [...dadosCliente.cartoes, novoCartao],
-      });
+      if (novoCartao.index !== null) {
+        setDadosCliente((prev) => {
+          const updatedCartoes = [...(prev.cartoes || [])];
+          updatedCartoes[novoCartao.index] = novoCartao;
+
+          return {
+            ...prev,
+            cartoes: updatedCartoes,
+          };
+        });
+      } else {
+        setDadosCliente({
+          ...dadosCliente,
+          cartoes: [...dadosCliente.cartoes, novoCartao],
+        });
+      }
       setMostrarPopupCartoes(false);
     }
   };
@@ -291,7 +317,7 @@ const RegistrarCliente = () => {
           </div>
           <div className="row">
             <div className="row gap-2">
-              <div className="col">
+              <div className="col-3 p-0">
                 <div className="row label ps-2">Nome:</div>
                 <div className="row">
                   <Input
@@ -307,7 +333,38 @@ const RegistrarCliente = () => {
                   />
                 </div>
               </div>
-              <div className="col-auto">
+              <div className="col-2 p-0">
+                <div className="row label ps-2">CPF:</div>
+                <div className="row">
+                  <Input
+                    type="text"
+                    isOnlyNumbers={true}
+                    value={dadosCliente.cpf}
+                    isCorrect={validacaoCampos.cpf}
+                    maxLength={11}
+                    onChange={(value) => {
+                      setDadosCliente({ ...dadosCliente, cpf: value });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-2 p-0">
+                <div className="row label ps-2">Data Nasc.:</div>
+                <div className="row">
+                  <Input
+                    type="text"
+                    value={dadosCliente.nascimento}
+                    isCorrect={validacaoCampos.nascimento}
+                    onChange={(value) => {
+                      setDadosCliente({
+                        ...dadosCliente,
+                        nascimento: value,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-auto p-0">
                 <div className="row label ps-2">Gênero:</div>
                 <div className="row">
                   <Dropdown className="p-0">
@@ -351,40 +408,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="row gap-2">
-              <div className="col">
-                <div className="row label ps-2">Data Nasc.:</div>
-                <div className="row">
-                  <Input
-                    type="text"
-                    value={dadosCliente.nascimento}
-                    isCorrect={validacaoCampos.nascimento}
-                    onChange={(value) => {
-                      setDadosCliente({
-                        ...dadosCliente,
-                        nascimento: value,
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="col">
-                <div className="row label ps-2">CPF:</div>
-                <div className="row">
-                  <Input
-                    type="text"
-                    isOnlyNumbers={true}
-                    value={dadosCliente.cpf}
-                    isCorrect={validacaoCampos.cpf}
-                    maxLength={11}
-                    onChange={(value) => {
-                      setDadosCliente({ ...dadosCliente, cpf: value });
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="row gap-2">
-              <div className="col">
+              <div className="col-3 p-0">
                 <div className="row label ps-2">Email:</div>
                 <div className="row">
                   <Input
@@ -406,7 +430,7 @@ const RegistrarCliente = () => {
                   />
                 </div>
               </div>
-              <div className="col">
+              <div className="col-2 p-0">
                 <div className="row label ps-2">Telefone:</div>
                 <div className="row">
                   <Input
@@ -424,9 +448,7 @@ const RegistrarCliente = () => {
                   />
                 </div>
               </div>
-            </div>
-            <div className="row gap-2">
-              <div className="col">
+              <div className="col-3 p-0">
                 <div className="row label ps-2">Senha:</div>
                 <div className="row">
                   <Input
@@ -457,7 +479,7 @@ const RegistrarCliente = () => {
                   />
                 </div>
               </div>
-              <div className="col">
+              <div className="col-3 p-0">
                 <div className="row label ps-2">Confirmar Senha:</div>
                 <div className="row">
                   <Input
@@ -496,15 +518,77 @@ const RegistrarCliente = () => {
           </div>
           <div className="row overflow-x-auto overflow-y-hidden pb-1 gap-2">
             {dadosCliente.enderecos.map((endereco, index) => (
-              <div key={index} className={`col-auto ${Styles.endereco_card}`}>
-                <div className="row">
-                  {endereco.nome} {endereco.isFavorito && "★"}
+              <div
+                key={index}
+                className={`col-auto ${styles.endereco_card}`}
+                onClick={() => {
+                  setNovoEndereco({ ...endereco, index: index });
+                  setValidacaoCampos({ ...validacaoCampos, endereco: {} });
+                  setMostrarPopupEnderecos(true);
+                }}
+              >
+                <div
+                  className="row mt-1 overflow-hidden"
+                  style={{
+                    flexWrap: "nowrap",
+                  }}
+                >
+                  <div
+                    className="col"
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: "1 1 auto",
+                    }}
+                  >
+                    {endereco.nomeEndereco} {endereco.isFavorito && "★"}
+                  </div>
+                  {/* <div
+                    className="col-auto p-0"
+                    style={{ color: "var(--white)" }}
+                  >
+                    <FontAwesomeIcon icon={faEdit} size="xs" />
+                  </div> */}
+                  <div
+                    className={`${"col-auto px-2"} ${styles.delete_icon}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDadosCliente((prev) => {
+                        const updatedEnderecos = [
+                          ...prev.enderecos.filter(
+                            (end, indexEnd) => indexEnd != index
+                          ),
+                        ];
+
+                        return {
+                          ...prev,
+                          enderecos: updatedEnderecos,
+                        };
+                      });
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faTrash} size="xs" />
+                  </div>
                 </div>
-                <div className="row">{endereco.logradouro}</div>
+                <div className="row">
+                  <div
+                    className="col"
+                    style={{
+                      overflow: "hidden",
+                      textWrap: "nowrap",
+                      textOverflow: "ellipsis",
+                      flex: "1 1 auto",
+                    }}
+                  >
+                    {endereco.logradouro}
+                  </div>
+                </div>
               </div>
             ))}
             <div
-              className={`col-auto ${Styles.add_card}`}
+              className={`col-auto ${styles.add_card}`}
+              style={{ minHeight: "75px" }}
               onClick={() => {
                 setNovoEndereco({});
                 setValidacaoCampos({ ...validacaoCampos, endereco: {} });
@@ -524,15 +608,71 @@ const RegistrarCliente = () => {
           </div>
           <div className="row overflow-x-auto overflow-y-hidden pb-1 gap-2">
             {dadosCliente.cartoes.map((cartao, index) => (
-              <div key={index} className={`col-auto ${Styles.cartao_card}`}>
-                <div className="row">
-                  {cartao.nomeCartao} {cartao.isFavorito && "★"}
+              <div
+                key={index}
+                className={`col-auto ${styles.cartao_card}`}
+                onClick={() => {
+                  setNovoCartao({ ...cartao, index: index });
+                  setValidacaoCampos({ ...validacaoCampos, cartao: {} });
+                  setMostrarPopupCartoes(true);
+                }}
+              >
+                <div
+                  className="row mt-1 overflow-hidden"
+                  style={{
+                    flexWrap: "nowrap",
+                  }}
+                >
+                  <div
+                    className="col"
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: "1 1 auto",
+                    }}
+                  >
+                    {cartao.nomeCartao} {cartao.isFavorito && "★"}
+                  </div>
+                  <div
+                    className={`${"col-auto px-2"} ${styles.delete_icon}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDadosCliente((prev) => {
+                        const updatedCartoes = [
+                          ...prev.cartoes.filter(
+                            (end, indexCartao) => indexCartao != index
+                          ),
+                        ];
+
+                        return {
+                          ...prev,
+                          cartoes: updatedCartoes,
+                        };
+                      });
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faTrash} size="xs" />
+                  </div>
                 </div>
-                <div className="row">{cartao.numeroCartao}</div>
+                <div className="row">
+                  <div
+                    className="col"
+                    style={{
+                      overflow: "hidden",
+                      textWrap: "nowrap",
+                      textOverflow: "ellipsis",
+                      flex: "1 1 auto",
+                    }}
+                  >
+                    {cartao.numeroCartao}
+                  </div>
+                </div>
               </div>
             ))}
             <div
-              className={`col-auto ${Styles.add_card}`}
+              className={`col-auto ${styles.add_card}`}
+              style={{ minHeight: "75px" }}
               onClick={() => {
                 setNovoCartao({});
                 setValidacaoCampos({ ...validacaoCampos, cartao: {} });
@@ -545,7 +685,7 @@ const RegistrarCliente = () => {
           <div className="row">
             {mostrarAlertaErro && (
               <Alert variant={"danger"}>
-                Existem campos com valores inválidos.
+                Os campos em vermelho estão com valores inválidos.
               </Alert>
             )}
           </div>
@@ -823,6 +963,8 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Input
                   value={novoCartao.numeroCartao}
+                  isOnlyNumbers={true}
+                  maxLength={16}
                   isCorrect={validacaoCampos.cartao.numeroCartao}
                   onChange={(value) => {
                     setNovoCartao({
@@ -851,21 +993,6 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">Bandeira do Cartão:</div>
-              <div className="row">
-                <Input
-                  value={novoCartao.bandeira}
-                  isCorrect={validacaoCampos.cartao.bandeira}
-                  onChange={(value) => {
-                    setNovoCrato({
-                      ...novoCartao,
-                      bandeira: value,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-            <div className="col">
               <div className="row label ps-2">Código de Segurança:</div>
               <div className="row">
                 <Input
@@ -878,6 +1005,51 @@ const RegistrarCliente = () => {
                     });
                   }}
                 />
+              </div>
+            </div>
+            <div className="col-auto p-0">
+              <div className="row label ps-2">Bandeira do Cartão:</div>
+              <div className="row">
+                <Dropdown className="col p-0">
+                  <Dropdown.Toggle variant="success" id="dropdown-basic">
+                    {novoCartao.bandeira || "Selecione a bandeira"}
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      onClick={() =>
+                        setNovoCartao({
+                          ...novoCartao,
+                          bandeira: "MasterCard",
+                        })
+                      }
+                    >
+                      MasterCard
+                    </Dropdown.Item>
+
+                    <Dropdown.Item
+                      onClick={() =>
+                        setNovoCartao({
+                          ...novoCartao,
+                          bandeira: "VISA",
+                        })
+                      }
+                    >
+                      VISA
+                    </Dropdown.Item>
+
+                    <Dropdown.Item
+                      onClick={() =>
+                        setNovoCartao({
+                          ...novoCartao,
+                          bandeira: "Elo",
+                        })
+                      }
+                    >
+                      Elo
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
           </div>

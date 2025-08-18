@@ -65,3 +65,33 @@ body {
   padding: 0;
   margin: 0;
 }
+
+.dropdown .btn {
+  background-color: var(--white);
+  color: var(--secondary);
+  border: 3px solid transparent;
+}
+
+.dropdown .btn:active {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--white);
+}
+
+/* Cor de fundo do menu */
+.dropdown-menu {
+  background-color: #242424;
+  border: none;
+}
+
+/* Estilo dos itens */
+.dropdown-item {
+  color: #f1f1f1;
+}
+
+/* Hover ativo */
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #4f4f4f;
+  color: #fff;
+}
