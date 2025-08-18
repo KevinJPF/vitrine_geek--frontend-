@@ -359,7 +359,7 @@ const RegistrarCliente = () => {
           <div className="row px-3 pb-3">
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Nome:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -380,7 +380,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   CPF:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -400,7 +400,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Data Nasc.:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -421,7 +421,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-auto p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Gênero:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -470,7 +470,7 @@ const RegistrarCliente = () => {
             </div>
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Email:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -497,7 +497,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Telefone:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -520,7 +520,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Senha:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -556,7 +556,7 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Confirmar Senha:
                   <span className="col ps-1" style={{ color: "var(--red)" }}>
                     *
@@ -831,7 +831,7 @@ const RegistrarCliente = () => {
         <div className="col d-flex flex-column gap-3">
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Nome:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -851,7 +851,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Tipo de Residência:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -871,7 +871,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Tipo de Logradouro:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -891,7 +891,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 CEP:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -913,7 +913,7 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 País:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -933,7 +933,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Estado:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -953,7 +953,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Cidade:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -973,7 +973,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Bairro:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -995,7 +995,7 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Logradouro:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -1051,7 +1051,7 @@ const RegistrarCliente = () => {
           </div>
           <div
             className="row mt-2 gap-2 justify-content-center align-items-center bg-white rounded-pill"
-            style={{ color: "var(--secondary)" }}
+            style={{ color: "var(--secondary)", flexWrap: "nowrap" }}
           >
             Cobrança:
             <SwitchButton
@@ -1169,7 +1169,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Código de Segurança:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -1189,7 +1189,7 @@ const RegistrarCliente = () => {
               </div>
             </div>
             <div className="col-auto p-0">
-              <div className="row label ps-2">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 Bandeira do Cartão:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
