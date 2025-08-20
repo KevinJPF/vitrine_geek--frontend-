@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import styles from "./Clientes.module.css";
 import Input, { MasksEnum } from "../../Components/Input/Input";
@@ -8,7 +8,7 @@ import useValidation from "../../Hooks/useValidation";
 import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const RegistrarCliente = () => {
   // #region Variaveis
@@ -119,7 +119,9 @@ const RegistrarCliente = () => {
 
   // #region Funcoes
   const compararSenha = (senhaOriginal, senhaParaConfirmar) => {
-    const isEqual = senhaParaConfirmar == senhaOriginal;
+    const isEqual =
+      senhaParaConfirmar == senhaOriginal &&
+      validatePassword(dadosCliente.senha);
     if (isEqual) console.log("ingual");
     return isEqual;
   };
@@ -359,15 +361,10 @@ const RegistrarCliente = () => {
           <div className="row px-3 pb-3">
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Nome:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
-                    type="text"
+                    label={"Nome:"}
+                    isRequired={true}
                     value={dadosCliente.nome}
                     isCorrect={validacaoCampos.nome}
                     onChange={(value) => {
@@ -380,15 +377,10 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  CPF:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
-                    type="text"
+                    label={"CPF:"}
+                    isRequired={true}
                     maskType={MasksEnum.CPF}
                     value={dadosCliente.cpf}
                     isCorrect={validacaoCampos.cpf}
@@ -399,15 +391,10 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Data Nasc.:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
-                    type="text"
+                    label={"Data Nasc.:"}
+                    isRequired={true}
                     maskType={MasksEnum.DATE}
                     value={dadosCliente.nascimento}
                     isCorrect={validacaoCampos.nascimento}
@@ -470,15 +457,11 @@ const RegistrarCliente = () => {
             </div>
             <div className="row gap-2">
               <div className="col-3 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Email:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
                     type="text"
+                    label={"Email:"}
+                    isRequired={true}
                     value={dadosCliente.email}
                     isCorrect={validacaoCampos.email}
                     onChange={(value) => {
@@ -497,15 +480,10 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-2 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Telefone:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
-                    type="text"
+                    label={"Telefone:"}
+                    isRequired={true}
                     maskType={MasksEnum.PHONE}
                     value={dadosCliente.telefone}
                     isCorrect={validacaoCampos.telefone}
@@ -519,15 +497,11 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Senha:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
                     value={dadosCliente.senha}
+                    label={"Senha:"}
+                    isRequired={true}
                     isCorrect={validacaoCampos.senha}
                     isPassword={true}
                     // isCorrect={false}
@@ -555,15 +529,11 @@ const RegistrarCliente = () => {
                 </div>
               </div>
               <div className="col-3 p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Confirmar Senha:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
                 <div className="row">
                   <Input
                     value={senhaParaConfirmar}
+                    label={"Confirma Senha:"}
+                    isRequired={true}
                     isPassword={true}
                     isCorrect={validacaoCampos.senha}
                     onChange={(value) => {
@@ -1059,7 +1029,7 @@ const RegistrarCliente = () => {
             Cobrança:
             <SwitchButton
               checked={novoEndereco.isCobranca}
-              onChange={(value) => {
+              onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
                   isCobranca: !novoEndereco.isCobranca,
@@ -1070,7 +1040,7 @@ const RegistrarCliente = () => {
             Entrega:
             <SwitchButton
               checked={novoEndereco.isEntrega}
-              onChange={(value) => {
+              onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
                   isEntrega: !novoEndereco.isEntrega,
@@ -1081,7 +1051,7 @@ const RegistrarCliente = () => {
             Favorito:
             <SwitchButton
               checked={novoEndereco.isFavorito}
-              onChange={(value) => {
+              onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
                   isFavorito: !novoEndereco.isFavorito,
@@ -1254,7 +1224,7 @@ const RegistrarCliente = () => {
                 Favorito:
                 <SwitchButton
                   checked={novoCartao.isFavorito}
-                  onChange={(value) => {
+                  onChange={() => {
                     setNovoCartao({
                       ...novoCartao,
                       isFavorito: !novoCartao.isFavorito,

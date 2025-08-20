@@ -1,8 +1,11 @@
-import Styles from "./input.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import styles from "./input.module.css";
+import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 
 /**
  * Enum com as máscaras mais comuns.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const MasksEnum = {
   NONE: "NONE",
   CPF: "CPF",
@@ -31,12 +34,14 @@ const getMaxLengthForMask = (maskType) => {
 
 const Input = ({
   value = "",
+  label,
   isOnlyNumbers = false,
   onChange = () => {},
   onFocus = () => {},
   onBlur = () => {},
   maxLength,
   isPassword = false,
+  isRequired = false,
   isCorrect = null,
   maskType = MasksEnum.NONE,
 }) => {
@@ -87,19 +92,38 @@ const Input = ({
     maskType !== MasksEnum.NONE ? getMaxLengthForMask(maskType) : maxLength;
 
   return (
-    <div className="col-12 p-0">
-      <input
-        className={`${Styles.input} ${
-          isCorrect != null &&
-          (isCorrect ? Styles.input_ok : Styles.input_error)
-        } shadow`}
-        type={isPassword ? "password" : "text"}
-        value={value}
-        onChange={handleChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        maxLength={finalMaxLength}
-      />
+    <div className="col">
+      {label && (
+        <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
+          {label}
+          {isRequired && (
+            <div className="col-auto p-0" style={{ color: "var(--red)" }}>
+              *
+            </div>
+          )}
+        </div>
+      )}
+      <div className="col-12 p-0 position-relative">
+        <input
+          className={`${styles.input} ${
+            isCorrect != null &&
+            (isCorrect ? styles.input_ok : styles.input_error)
+          } shadow`}
+          type={isPassword ? "password" : "text"}
+          value={value}
+          onChange={handleChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          maxLength={finalMaxLength}
+        />
+        <div
+          className={
+            isCorrect == false ? styles.alert_icon : styles.alert_icon_hidden
+          }
+        >
+          <FontAwesomeIcon icon={faExclamation} />
+        </div>
+      </div>
     </div>
   );
 };
