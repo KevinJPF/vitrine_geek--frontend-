@@ -1,0 +1,31 @@
+.main_container {
+  width: 15vw;
+  border-right: 8px solid var(--primary);
+  user-select: none;
+}
+
+.menu_item {
+  background-color: var(--secondary);
+  border-bottom: 4px solid var(--primary);
+  cursor: pointer;
+  transition: 0.1s ease-in-out;
+}
+
+.menu_item:hover,
+.active {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
+.active {
+  opacity: 80%;
+}
+
+.active:hover {
+  opacity: 100%;
+}
+
+.menu_item:active {
+  background-color: var(--white);
+  border-color: var(--white);
+}

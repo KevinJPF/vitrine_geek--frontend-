@@ -80,6 +80,11 @@ body {
   border-color: var(--green);
 }
 
+.card {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
 /* Estilo global do scroll (página inteira e qualquer elemento com overflow)  */
 * {
   scrollbar-width: thin; /* Firefox */

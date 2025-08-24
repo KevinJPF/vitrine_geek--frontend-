@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import styles from "./Clientes.module.css";
-import Input, { MasksEnum } from "../../Components/Input/Input";
-import PopupModal from "../../Components/PopupModal/PopupModal";
-import SwitchButton from "../../Components/SwitchButton/SwitchButton";
-import useValidation from "../../Hooks/useValidation";
+import Input, { MasksEnum } from "../../../Components/Input/Input";
+import PopupModal from "../../../Components/PopupModal/PopupModal";
+import SwitchButton from "../../../Components/SwitchButton/SwitchButton";
+import useValidation from "../../../Hooks/useValidation";
 import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
