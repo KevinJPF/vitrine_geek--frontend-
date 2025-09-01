@@ -54,6 +54,12 @@ const SideMenu = () => {
       >
         Logs de Transação
       </div> */}
+      <div
+        className={`row p-2 ${styles.menu_item} ${styles.exit}`}
+        onClick={() => !isActive("/") && navigate("/")}
+      >
+        Voltar
+      </div>
     </div>
   );
 };

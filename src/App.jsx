@@ -8,12 +8,21 @@ import ListarProdutos from "./Pages/Admin/Produtos/ListarProdutos";
 import RegistrarProduto from "./Pages/Admin/Produtos/RegistrarProduto";
 import Dashboard from "./Pages/Admin/Dashboard/Dashboard";
 import ListarPedidos from "./Pages/Admin/ListarPedidos/ListarPedidos";
+import Header from "./Components/Header/Header";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            <div>
+              <Header />
+              <Home />
+            </div>
+          }
+        />
         // #region Admin
         <Route
           path="/dashboard"

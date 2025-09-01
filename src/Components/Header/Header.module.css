@@ -1,0 +1,19 @@
+.button {
+  user-select: none;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.button:hover {
+  scale: 1.1;
+}
+
+.logo {
+  color: var(--secondary);
+  font-size: 2rem;
+  /* background-color: var(--secondary); */
+  user-select: none;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+    

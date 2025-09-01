@@ -1,177 +1,30 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useFetchData } from "../../../Hooks/useFetchData";
 
 const ListarClientes = () => {
   const navigate = useNavigate();
-  const [clientes, setClientes] = useState([
-    {
-      nome: "João Silva",
-      genero: "Masculino",
-      cpf: "12345678901",
-      nascimento: "10/05/1990",
-      email: "joao.silva@email.com",
-      telefone: "11987654321",
-      senha: "123456",
-      ativo: true,
-      enderecos: [
-        {
-          nomeEndereco: "Casa",
-          tipoResidencia: "Apartamento",
-          tipoLogradouro: "Rua",
-          cep: "12345-678",
-          pais: "Brasil",
-          estado: "SP",
-          cidade: "São Paulo",
-          bairro: "Jardins",
-          numero: "123",
-          logradouro: "Rua das Flores",
-          observacoes: "Portaria 24h",
-          isCobranca: true,
-          isEntrega: true,
-          isFavorito: true,
-        },
-        {
-          nomeEndereco: "Trabalho",
-          tipoResidencia: "Comercial",
-          tipoLogradouro: "Avenida",
-          cep: "87654-321",
-          pais: "Brasil",
-          estado: "RJ",
-          cidade: "Rio de Janeiro",
-          bairro: "Centro",
-          numero: "456",
-          logradouro: "Avenida Central",
-          observacoes: "Prédio Azul, 5º andar",
-          isCobranca: false,
-          isEntrega: true,
-          isFavorito: false,
-        },
-      ],
-      cartoes: [
-        {
-          nomeCartao: "Cartão Pessoal",
-          numeroCartao: "4111111111111111",
-          nomeImpresso: "KEVIN J P FRANCISCO",
-          bandeira: "Visa",
-          codigoSeguranca: "123",
-          isFavorito: true,
-        },
-      ],
-    },
-    {
-      nome: "Maria Oliveira",
-      genero: "Feminino",
-      cpf: "98765432109",
-      nascimento: "22/11/1988",
-      email: "maria.oliveira@email.com",
-      telefone: "11999998888",
-      senha: "maria@123",
-      ativo: true,
-      enderecos: [
-        {
-          nomeEndereco: "Casa dos Pais",
-          tipoResidencia: "Casa",
-          tipoLogradouro: "Travessa",
-          cep: "34567-890",
-          pais: "Brasil",
-          estado: "MG",
-          cidade: "Belo Horizonte",
-          bairro: "Savassi",
-          numero: "89",
-          logradouro: "Travessa da Serra",
-          observacoes: "Cachorro bravo no portão",
-          isCobranca: true,
-          isEntrega: false,
-          isFavorito: false,
-        },
-      ],
-      cartoes: [
-        {
-          nomeCartao: "Cartão Trabalho",
-          numeroCartao: "5500000000000004",
-          nomeImpresso: "KEVIN FRANCISCO",
-          bandeira: "Mastercard",
-          codigoSeguranca: "456",
-          isFavorito: false,
-        },
-        {
-          nomeCartao: "Cartão Emergência",
-          numeroCartao: "340000000000009",
-          nomeImpresso: "K J P FRANCISCO",
-          bandeira: "American Express",
-          codigoSeguranca: "789",
-          isFavorito: false,
-        },
-      ],
-    },
-    {
-      nome: "Pedro Costa",
-      genero: "Masculino",
-      cpf: "45678912300",
-      nascimento: "03/03/1995",
-      email: "pedro.costa@email.com",
-      telefone: "11955554444",
-      senha: "pedro@99",
-      ativo: false,
-      enderecos: [
-        {
-          nomeEndereco: "Chácara",
-          tipoResidencia: "Casa",
-          tipoLogradouro: "Estrada",
-          cep: "11223-445",
-          pais: "Brasil",
-          estado: "SP",
-          cidade: "Atibaia",
-          bairro: "Zona Rural",
-          numero: "SN",
-          logradouro: "Estrada do Lago",
-          observacoes: "Entrada de terra após a ponte",
-          isCobranca: false,
-          isEntrega: false,
-          isFavorito: false,
-        },
-      ],
-      cartoes: [
-        {
-          nomeCartao: "Cartão Nubank",
-          numeroCartao: "5274838273827483",
-          nomeImpresso: "KEVIN JULIANO",
-          bandeira: "Mastercard",
-          codigoSeguranca: "321",
-          isFavorito: false,
-        },
-      ],
-    },
-  ]);
+  const { fetchApiData } = useFetchData("clientes");
+  const [clientes, setClientes] = useState([]);
 
   const alterarStatusCliente = (clienteParaAlterar) => {
     setClientes(
       clientes.map((cliente) => {
-        if (cliente == clienteParaAlterar) cliente.ativo = !cliente.ativo;
+        if (cliente == clienteParaAlterar)
+          cliente.cliente_ativo = !cliente.cliente_ativo;
         return cliente;
       })
     );
   };
 
   useEffect(() => {
-    const novoCliente = localStorage.getItem("novoCliente");
-    const editcliente = localStorage.getItem("editCliente");
-    const index = localStorage.getItem("indexCliente");
+    const fetchClientes = async () => {
+      const result = await fetchApiData("clientes");
+      console.log(result);
+      setClientes(result);
+    };
 
-    if (editcliente && index !== null) {
-      setClientes((old) => {
-        const updated = [...old];
-        updated[index] = JSON.parse(editcliente);
-        return updated;
-      });
-      localStorage.removeItem("editCliente");
-      localStorage.removeItem("indexCliente");
-    }
-
-    if (novoCliente) {
-      setClientes((old) => [...old, JSON.parse(novoCliente)]);
-      localStorage.removeItem("novoCliente");
-    }
+    fetchClientes();
   }, []);
 
   return (
@@ -203,7 +56,7 @@ const ListarClientes = () => {
               borderRight: "2px solid var(--highlight)",
             }}
           >
-            Nome
+            nome_cliente
           </div>
           <div
             className="col-3  d-flex justify-content-center"
@@ -227,7 +80,7 @@ const ListarClientes = () => {
               borderRight: "2px solid var(--highlight)",
             }}
           >
-            Ativo
+            cliente_ativo
           </div>
           <div className="col-3  d-flex justify-content-center">Ação</div>
         </div>
@@ -255,7 +108,7 @@ const ListarClientes = () => {
                     borderRight: "2px solid var(--secondary)",
                   }}
                 >
-                  {cliente.nome}
+                  {cliente.nome_cliente}
                 </div>
                 <div
                   className="col-3"
@@ -276,11 +129,13 @@ const ListarClientes = () => {
                 <div
                   className="col-2 label d-flex justify-content-center"
                   style={{
-                    color: cliente.ativo ? "var(--green)" : "var(--red)",
+                    color: cliente.cliente_ativo
+                      ? "var(--green)"
+                      : "var(--red)",
                     borderRight: "2px solid var(--secondary)",
                   }}
                 >
-                  {cliente.ativo ? "✓" : "x"}
+                  {cliente.cliente_ativo ? "✓" : "x"}
                 </div>
                 <div className="col-3 gap-2 d-flex justify-content-center">
                   <button
@@ -296,14 +151,14 @@ const ListarClientes = () => {
                   </button>
                   <button
                     className={`btn ${
-                      cliente.ativo ? "btn-danger" : "btn-green"
+                      cliente.cliente_ativo ? "btn-danger" : "btn-green"
                     }`}
                     onClick={() => {
-                      // Alert(`Remover cliente ${cliente.nome}?`);
+                      // Alert(`Remover cliente ${cliente.nome_cliente}?`);
                       alterarStatusCliente(cliente);
                     }}
                   >
-                    {cliente.ativo ? "Desativar" : "Ativar"}
+                    {cliente.cliente_ativo ? "Desativar" : "Ativar"}
                   </button>
                 </div>
               </div>
