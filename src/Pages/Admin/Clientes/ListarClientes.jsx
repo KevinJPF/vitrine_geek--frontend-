@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useFetchData } from "../../../Hooks/useFetchData";
+import { usePatchData } from "../../../Hooks/usePatchData";
 
 const ListarClientes = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const { fetchApiData } = useFetchData("clientes");
+  const { fetchApiData } = useFetchData();
+  const { patchApiData } = usePatchData();
   const [clientes, setClientes] = useState([]);
 
   const alterarStatusCliente = (clienteParaAlterar) => {
@@ -18,14 +21,14 @@ const ListarClientes = () => {
   };
 
   useEffect(() => {
-    const fetchClientes = async () => {
-      const result = await fetchApiData("clientes");
-      console.log(result);
-      setClientes(result);
-    };
-
     fetchClientes();
-  }, []);
+  }, [location]);
+
+  const fetchClientes = async () => {
+    const result = await fetchApiData("clientes");
+    // console.log(result);
+    setClientes(result);
+  };
 
   return (
     <div className="container d-flex flex-column min-vh-100">
@@ -56,7 +59,7 @@ const ListarClientes = () => {
               borderRight: "2px solid var(--highlight)",
             }}
           >
-            nome_cliente
+            Nome
           </div>
           <div
             className="col-3  d-flex justify-content-center"
@@ -80,7 +83,7 @@ const ListarClientes = () => {
               borderRight: "2px solid var(--highlight)",
             }}
           >
-            cliente_ativo
+            Ativo
           </div>
           <div className="col-3  d-flex justify-content-center">Ação</div>
         </div>
@@ -106,6 +109,9 @@ const ListarClientes = () => {
                   className="col-2"
                   style={{
                     borderRight: "2px solid var(--secondary)",
+                    textWrap: "nowrap",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
                   }}
                 >
                   {cliente.nome_cliente}
@@ -114,6 +120,9 @@ const ListarClientes = () => {
                   className="col-3"
                   style={{
                     borderRight: "2px solid var(--secondary)",
+                    textWrap: "nowrap",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
                   }}
                 >
                   {cliente.email}
@@ -142,7 +151,7 @@ const ListarClientes = () => {
                     className="btn btn-inverted"
                     onClick={() => {
                       localStorage.setItem("indexCliente", index);
-                      navigate("/registrar-cliente", {
+                      navigate(`/registrar-cliente/${cliente.id_cliente}`, {
                         state: { cliente },
                       });
                     }}
@@ -153,9 +162,16 @@ const ListarClientes = () => {
                     className={`btn ${
                       cliente.cliente_ativo ? "btn-danger" : "btn-green"
                     }`}
-                    onClick={() => {
-                      // Alert(`Remover cliente ${cliente.nome_cliente}?`);
-                      alterarStatusCliente(cliente);
+                    onClick={async () => {
+                      if (
+                        (
+                          await patchApiData(
+                            "clientes/ativar-desativar",
+                            cliente.id_cliente
+                          )
+                        ).status === 200
+                      )
+                        alterarStatusCliente(cliente);
                     }}
                   >
                     {cliente.cliente_ativo ? "Desativar" : "Ativar"}
@@ -178,7 +194,7 @@ const ListarClientes = () => {
         <button
           className="btn"
           onClick={async () => {
-            navigate("/registrar-cliente");
+            await navigate("/registrar-cliente");
           }}
         >
           Adicionar

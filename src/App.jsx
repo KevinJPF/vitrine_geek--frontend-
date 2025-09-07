@@ -51,6 +51,7 @@ function App() {
           }
         />
         <Route path="/registrar-cliente" element={<RegistrarCliente />} />
+        <Route path="/registrar-cliente/:id" element={<RegistrarCliente />} />
         <Route
           path="/produtos"
           element={

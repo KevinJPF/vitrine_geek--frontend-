@@ -26,8 +26,11 @@ export default function useValidation() {
   // Email
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  // Telefone (formato simples, 10 ou 11 dígitos)
-  const validatePhone = (value) => /^\d{10,11}$/.test(value.replace(/\D/g, ""));
+  // DDD (2 dígitos)
+  const validateDDD = (value) => /^\d{2}$/.test(value.replace(/\D/g, ""));
+
+  // Telefone (formato simples, 8 ou 0 dígitos)
+  const validatePhone = (value) => /^\d{8,9}$/.test(value.replace(/\D/g, ""));
 
   // CEP (apenas dígitos, 8 caracteres)
   const validateCEP = (value) => /^\d{8}$/.test(value.replace(/\D/g, ""));
@@ -86,6 +89,7 @@ export default function useValidation() {
     validateRequired,
     validateCPF,
     validateEmail,
+    validateDDD,
     validatePhone,
     validateCEP,
     validateCreditCard,

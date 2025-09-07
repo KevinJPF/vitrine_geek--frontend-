@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 
-export const usePutData = () => {
+export const usePatchData = () => {
   const [response, setResponse] = useState(null);
-  const [error, setError] = useState(null);
 
-  const putApiData = async (endpoint, id, body) => {
+  const patchApiData = async (endpoint, id, body = {}) => {
     try {
       const res = await fetch(`http://localhost:3000/${endpoint}/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -19,14 +18,12 @@ export const usePutData = () => {
       }
       const data = await res.text();
       setResponse(data);
-      setError(null);
-      return response;
+      return res;
     } catch (error) {
-      setError(error.message);
       setResponse(null);
       return error.message;
     }
   };
 
-  return { putApiData, response, error };
+  return { patchApiData, response };
 };

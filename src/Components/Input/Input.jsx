@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./input.module.css";
-import { faExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faExclamation } from "@fortawesome/free-solid-svg-icons";
 
 /**
  * Enum com as máscaras mais comuns.
@@ -9,6 +9,7 @@ import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 export const MasksEnum = {
   NONE: "NONE",
   CPF: "CPF",
+  CEL: "CEL",
   PHONE: "PHONE",
   CEP: "CEP",
   DATE: "DATE",
@@ -20,7 +21,9 @@ const getMaxLengthForMask = (maskType) => {
     case MasksEnum.CPF:
       return 14; // 000.000.000-00
     case MasksEnum.PHONE:
-      return 15; // (00) 00000-0000
+      return 9; // 0000-0000
+    case MasksEnum.CEL:
+      return 10; // 00000-0000
     case MasksEnum.CEP:
       return 9; // 00000-000
     case MasksEnum.DATE:
@@ -54,10 +57,9 @@ const Input = ({
           .replace(/(\d{3})(\d)/, "$1.$2")
           .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
       case MasksEnum.PHONE:
-        return value
-          .replace(/\D/g, "")
-          .replace(/(\d{2})(\d)/, "($1) $2")
-          .replace(/(\d{5})(\d)/, "$1-$2");
+        return value.replace(/\D/g, "").replace(/(\d{4})(\d)/, "$1-$2");
+      case MasksEnum.CEL:
+        return value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1-$2");
       case MasksEnum.CEP:
         return value.replace(/\D/g, "").replace(/(\d{5})(\d)/, "$1-$2");
       case MasksEnum.DATE:
@@ -116,13 +118,15 @@ const Input = ({
           onBlur={onBlur}
           maxLength={finalMaxLength}
         />
-        <div
-          className={
-            isCorrect == false ? styles.alert_icon : styles.alert_icon_hidden
-          }
-        >
-          <FontAwesomeIcon icon={faExclamation} />
-        </div>
+        {isCorrect != undefined && (
+          <div
+            className={`${styles.alert_icon} ${
+              isCorrect && styles.alert_icon_correct
+            }`}
+          >
+            <FontAwesomeIcon icon={isCorrect ? faCheck : faExclamation} />
+          </div>
+        )}
       </div>
     </div>
   );

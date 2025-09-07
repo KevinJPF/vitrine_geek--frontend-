@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 import styles from "./Clientes.module.css";
 import Input, { MasksEnum } from "../../../Components/Input/Input";
 import PopupModal from "../../../Components/PopupModal/PopupModal";
@@ -9,15 +9,27 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useCepFetchData } from "../../../Hooks/useCepFetchData";
+import { useFetchData } from "../../../Hooks/useFetchData";
+import { usePostData } from "../../../Hooks/usePostData";
+import { usePutData } from "../../../Hooks/usePutData";
 
 const RegistrarCliente = () => {
   // #region Variaveis
+  const { id } = useParams();
+  const { state } = useLocation();
+  const cliente = state?.cliente; // cliente passado pela tela de listagem
   const navigate = useNavigate();
+  const { fetchCepData } = useCepFetchData();
+  const { fetchApiData } = useFetchData();
+  const { postApiData } = usePostData();
+  const { putApiData } = usePutData();
 
   const {
     validateRequired,
     validateCPF,
     validateEmail,
+    validateDDD,
     validatePhone,
     validateCEP,
     validateCreditCard,
@@ -25,58 +37,25 @@ const RegistrarCliente = () => {
     validatePassword,
   } = useValidation();
 
-  const { state } = useLocation();
-  const cliente = state?.cliente; // cliente passado pela tela de listagem
+  const [bandeiras, setBandeiras] = useState([]);
   const [dadosCliente, setDadosCliente] = useState({
-    nome: (cliente && cliente.nome) ?? "",
+    nome_cliente: (cliente && cliente.nome_cliente) ?? "",
     genero: (cliente && cliente.genero) ?? "",
     cpf: (cliente && cliente.cpf) ?? "",
-    nascimento: (cliente && cliente.nascimento) ?? "",
+    data_nascimento: (cliente && cliente.data_nascimento) ?? "",
     email: (cliente && cliente.email) ?? "",
-    telefone: (cliente && cliente.telefone) ?? "",
+    telefone_ddd: (cliente && cliente.telefone_ddd) ?? "",
+    telefone_numero: (cliente && cliente.telefone_numero) ?? "",
+    telefone_tipo: (cliente && cliente.telefone_tipo) ?? "Celular",
     senha: (cliente && cliente.senha) ?? "",
-    ativo: (cliente && cliente.ativo) ?? true,
-    enderecos: (cliente && cliente.enderecos) ?? [
-      {
-        nomeEndereco: "Casa dos Pais",
-        tipoResidencia: "Casa",
-        tipoLogradouro: "Travessa",
-        cep: "34567-890",
-        pais: "Brasil",
-        estado: "MG",
-        cidade: "Belo Horizonte",
-        bairro: "Savassi",
-        numero: "89",
-        logradouro: "Travessa da Serra",
-        observacoes: "Cachorro bravo no portão",
-        isCobranca: true,
-        isEntrega: false,
-        isFavorito: false,
-      },
-    ],
-    cartoes: (cliente && cliente.cartoes) ?? [
-      {
-        nomeCartao: "Cartão Pessoal",
-        numeroCartao: "4111111111111111",
-        nomeImpresso: "KEVIN J P FRANCISCO",
-        bandeira: "Visa",
-        codigoSeguranca: "123",
-        isFavorito: true,
-      },
-      {
-        nomeCartao: "Cartão Nubank",
-        numeroCartao: "5274838273827483",
-        nomeImpresso: "KEVIN JULIANO",
-        bandeira: "Mastercard",
-        codigoSeguranca: "321",
-        isFavorito: false,
-      },
-    ],
+    cliente_ativo: (cliente && cliente.cliente_ativo) ?? true,
+    enderecos: (cliente && cliente.enderecos) ?? [],
+    cartoes: (cliente && cliente.cartoes) ?? [],
   });
   const [novoEndereco, setNovoEndereco] = useState({
-    nomeEndereco: "",
-    tipoResidencia: "",
-    tipoLogradouro: "",
+    nome_endereco: "",
+    tipo_residencia: "",
+    tipo_logradouro: "",
     cep: "",
     pais: "",
     estado: "",
@@ -84,26 +63,26 @@ const RegistrarCliente = () => {
     bairro: "",
     numero: "",
     logradouro: "",
-    observacoes: "",
-    isCobranca: true,
-    isEntrega: false,
-    isFavorito: false,
+    obs_endereco: "",
+    endereco_cobranca: true,
+    endereco_entrega: false,
+    favorito: false,
   });
   const [novoCartao, setNovoCartao] = useState({
-    nomeCartao: "",
-    numeroCartao: "",
-    nomeImpresso: "",
-    bandeira: "",
-    codigoSeguranca: "",
-    isFavorito: false,
+    nome_cartao: "",
+    numero_cartao: "",
+    nome_impresso: "",
+    id_bandeira: "",
+    codigo_seguranca: "",
+    favorito: false,
   });
   const [validacaoCampos, setValidacaoCampos] = useState({
-    nome: null,
+    nome_cliente: null,
     genero: null,
-    nascimento: null,
+    data_nascimento: null,
     cpf: null,
     email: null,
-    telefone: null,
+    telefone_numero: null,
     senha: null,
     endereco: {},
     cartao: {},
@@ -116,6 +95,19 @@ const RegistrarCliente = () => {
   const [mostrarPopupCartoes, setMostrarPopupCartoes] = useState(false);
   const [mostrarAlertaErro, setMostrarAlertaErro] = useState(false);
   // #endregion
+
+  useEffect(() => {
+    fetchApiData("cartoes/bandeiras").then((data) => {
+      setBandeiras(data);
+    });
+    if (!cliente && id) {
+      fetchApiData(`clientes/${id}`).then((data) => {
+        console.log(data.message);
+        if (data.message) navigate("/clientes");
+        else setDadosCliente(data);
+      });
+    }
+  }, []);
 
   // #region Funcoes
   const compararSenha = (senhaOriginal, senhaParaConfirmar) => {
@@ -131,63 +123,85 @@ const RegistrarCliente = () => {
     let camposInvalidos = validacaoCampos;
 
     if (
-      !novoEndereco.nomeEndereco ||
-      !validateRequired(novoEndereco.nomeEndereco)
+      !novoEndereco.nome_endereco ||
+      !validateRequired(novoEndereco.nome_endereco)
     ) {
-      camposInvalidos.endereco.nomeEndereco = false;
+      camposInvalidos.endereco.nome_endereco = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.nome_endereco = undefined;
     }
+
     if (
-      !novoEndereco.tipoResidencia ||
-      !validateRequired(novoEndereco.tipoResidencia)
+      !novoEndereco.tipo_residencia ||
+      !validateRequired(novoEndereco.tipo_residencia)
     ) {
-      camposInvalidos.endereco.tipoResidencia = false;
+      camposInvalidos.endereco.tipo_residencia = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.tipo_residencia = undefined;
     }
+
     if (
-      !novoEndereco.tipoLogradouro ||
-      !validateRequired(novoEndereco.tipoLogradouro)
+      !novoEndereco.tipo_logradouro ||
+      !validateRequired(novoEndereco.tipo_logradouro)
     ) {
-      camposInvalidos.endereco.tipoLogradouro = false;
+      camposInvalidos.endereco.tipo_logradouro = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.tipo_logradouro = undefined;
     }
+
     if (!novoEndereco.pais || !validateRequired(novoEndereco.pais)) {
       camposInvalidos.endereco.pais = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.pais = undefined;
     }
+
     if (!novoEndereco.estado || !validateRequired(novoEndereco.estado)) {
       camposInvalidos.endereco.estado = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.estado = undefined;
     }
+
     if (!novoEndereco.cidade || !validateRequired(novoEndereco.cidade)) {
       camposInvalidos.endereco.cidade = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.cidade = undefined;
     }
+
     if (!novoEndereco.bairro || !validateRequired(novoEndereco.bairro)) {
       camposInvalidos.endereco.bairro = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.bairro = undefined;
     }
+
     if (!novoEndereco.numero || !validateRequired(novoEndereco.numero)) {
       camposInvalidos.endereco.numero = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.numero = undefined;
     }
+
     if (
       !novoEndereco.logradouro ||
       !validateRequired(novoEndereco.logradouro)
     ) {
       camposInvalidos.endereco.logradouro = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.logradouro = undefined;
     }
-    if (
-      !novoEndereco.observacoes ||
-      !validateRequired(novoEndereco.observacoes)
-    ) {
-      camposInvalidos.endereco.observacoes = false;
-      isInvalido = true;
-    }
+
     if (!novoEndereco.cep || !validateCEP(novoEndereco.cep)) {
       camposInvalidos.endereco.cep = false;
       isInvalido = true;
+    } else {
+      camposInvalidos.endereco.cep = undefined;
     }
 
     setValidacaoCampos({ ...validacaoCampos, camposInvalidos });
@@ -196,7 +210,7 @@ const RegistrarCliente = () => {
 
   const salvarEndereco = async () => {
     if (await validarTodosCamposEndereco()) {
-      if (novoEndereco.index !== null) {
+      if (novoEndereco.index >= 0) {
         setDadosCliente((prev) => {
           const updatedEnderecos = [...(prev.enderecos || [])];
           updatedEnderecos[novoEndereco.index] = novoEndereco;
@@ -207,10 +221,10 @@ const RegistrarCliente = () => {
           };
         });
       } else {
-        setDadosCliente({
-          ...dadosCliente,
-          enderecos: [...dadosCliente.enderecos, novoEndereco],
-        });
+        setDadosCliente((prev) => ({
+          ...prev,
+          enderecos: [...(prev.enderecos || []), novoEndereco],
+        }));
       }
       setMostrarPopupEnderecos(false);
     }
@@ -220,33 +234,33 @@ const RegistrarCliente = () => {
     let isInvalido = false;
     let camposInvalidos = validacaoCampos;
 
-    if (!novoCartao.nomeCartao || !validateRequired(novoCartao.nomeCartao)) {
-      camposInvalidos.cartao.nomeCartao = false;
+    if (!novoCartao.nome_cartao || !validateRequired(novoCartao.nome_cartao)) {
+      camposInvalidos.cartao.nome_cartao = false;
       isInvalido = true;
     }
     if (
-      !novoCartao.numeroCartao ||
-      !validateCreditCard(novoCartao.numeroCartao, true)
+      !novoCartao.numero_cartao ||
+      !validateCreditCard(novoCartao.numero_cartao, true)
     ) {
-      camposInvalidos.cartao.numeroCartao = false;
+      camposInvalidos.cartao.numero_cartao = false;
       isInvalido = true;
     }
     if (
-      !novoCartao.nomeImpresso ||
-      !validateRequired(novoCartao.nomeImpresso)
+      !novoCartao.nome_impresso ||
+      !validateRequired(novoCartao.nome_impresso)
     ) {
-      camposInvalidos.cartao.nomeImpresso = false;
+      camposInvalidos.cartao.nome_impresso = false;
       isInvalido = true;
     }
-    if (!novoCartao.bandeira || !validateRequired(novoCartao.bandeira)) {
+    if (!novoCartao.id_bandeira || !validateRequired(novoCartao.id_bandeira)) {
       camposInvalidos.cartao.bandeira = false;
       isInvalido = true;
     }
     if (
-      !novoCartao.codigoSeguranca ||
-      !validateRequired(novoCartao.codigoSeguranca)
+      !novoCartao.codigo_seguranca ||
+      !validateRequired(novoCartao.codigo_seguranca)
     ) {
-      camposInvalidos.cartao.codigoSeguranca = false;
+      camposInvalidos.cartao.codigo_seguranca = false;
       isInvalido = true;
     }
     setValidacaoCampos({ ...validacaoCampos, camposInvalidos });
@@ -255,7 +269,7 @@ const RegistrarCliente = () => {
 
   const salvarCartao = async () => {
     if (await validarTodosCamposCartao()) {
-      if (novoCartao.index !== null) {
+      if (novoCartao.index >= 0) {
         setDadosCliente((prev) => {
           const updatedCartoes = [...(prev.cartoes || [])];
           updatedCartoes[novoCartao.index] = novoCartao;
@@ -279,16 +293,16 @@ const RegistrarCliente = () => {
     let isInvalido = false;
     let camposInvalidos = validacaoCampos;
 
-    if (!validateRequired(dadosCliente.nome)) {
-      camposInvalidos.nome = false;
+    if (!validateRequired(dadosCliente.nome_cliente)) {
+      camposInvalidos.nome_cliente = false;
       isInvalido = true;
     }
     if (!validateRequired(dadosCliente.genero)) {
       camposInvalidos.genero = false;
       isInvalido = true;
     }
-    if (!validateDate(dadosCliente.nascimento)) {
-      camposInvalidos.nascimento = false;
+    if (!validateDate(dadosCliente.data_nascimento)) {
+      camposInvalidos.data_nascimento = false;
       isInvalido = true;
     }
     if (!validateCPF(dadosCliente.cpf, true)) {
@@ -299,8 +313,12 @@ const RegistrarCliente = () => {
       camposInvalidos.email = false;
       isInvalido = true;
     }
-    if (!validatePhone(dadosCliente.telefone)) {
-      camposInvalidos.telefone = false;
+    if (!validatePhone(dadosCliente.telefone_numero)) {
+      camposInvalidos.telefone_numero = false;
+      isInvalido = true;
+    }
+    if (!validateDDD(dadosCliente.telefone_ddd)) {
+      camposInvalidos.telefone_ddd = false;
       isInvalido = true;
     }
     if (
@@ -324,12 +342,18 @@ const RegistrarCliente = () => {
   };
 
   const salvarCliente = async () => {
+    console.log(dadosCliente);
     if (await validarTodosCamposCliente()) {
-      localStorage.setItem(
-        state?.cliente ? "editCliente" : "novoCliente",
-        JSON.stringify(dadosCliente)
-      );
-      navigate(-1);
+      try {
+        if (cliente || id) {
+          await putApiData("clientes", cliente.id_cliente, dadosCliente);
+        } else {
+          await postApiData("clientes", dadosCliente);
+        }
+        navigate("/clientes");
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       setMostrarAlertaErro(true);
     }
@@ -365,12 +389,12 @@ const RegistrarCliente = () => {
                   <Input
                     label={"Nome:"}
                     isRequired={true}
-                    value={dadosCliente.nome}
-                    isCorrect={validacaoCampos.nome}
+                    value={dadosCliente.nome_cliente}
+                    isCorrect={validacaoCampos.nome_cliente}
                     onChange={(value) => {
                       setDadosCliente({
                         ...dadosCliente,
-                        nome: value,
+                        nome_cliente: value,
                       });
                     }}
                   />
@@ -396,12 +420,12 @@ const RegistrarCliente = () => {
                     label={"Data Nasc.:"}
                     isRequired={true}
                     maskType={MasksEnum.DATE}
-                    value={dadosCliente.nascimento}
-                    isCorrect={validacaoCampos.nascimento}
+                    value={dadosCliente.data_nascimento}
+                    isCorrect={validacaoCampos.data_nascimento}
                     onChange={(value) => {
                       setDadosCliente({
                         ...dadosCliente,
-                        nascimento: value,
+                        data_nascimento: value,
                       });
                     }}
                   />
@@ -479,23 +503,92 @@ const RegistrarCliente = () => {
                   />
                 </div>
               </div>
-              <div className="col-2 p-0">
+              <div className="col-1 p-0">
                 <div className="row">
                   <Input
-                    label={"Telefone:"}
+                    label={"DDD:"}
                     isRequired={true}
-                    maskType={MasksEnum.PHONE}
-                    value={dadosCliente.telefone}
-                    isCorrect={validacaoCampos.telefone}
+                    isOnlyNumbers={true}
+                    maxLength={2}
+                    value={dadosCliente.telefone_ddd}
+                    isCorrect={validacaoCampos.telefone_ddd}
                     onChange={(value) => {
                       setDadosCliente({
                         ...dadosCliente,
-                        telefone: value,
+                        telefone_ddd: value,
                       });
                     }}
                   />
                 </div>
               </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Telefone:"}
+                    isRequired={true}
+                    maskType={
+                      dadosCliente.telefone_tipo === "Celular"
+                        ? MasksEnum.CEL
+                        : MasksEnum.PHONE
+                    }
+                    value={dadosCliente.telefone_numero}
+                    isCorrect={validacaoCampos.telefone_numero}
+                    onChange={(value) => {
+                      // const ddd = value.replace(/\D/g, "").slice(0, 2);
+                      // console.log(ddd);
+                      const numero = value.replace(/\D/g, "").slice(-9);
+                      console.log(numero);
+                      setDadosCliente({
+                        ...dadosCliente,
+                        telefone_numero: value,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-auto p-0">
+                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
+                  Tipo Telefone:
+                  <span className="col ps-1" style={{ color: "var(--red)" }}>
+                    *
+                  </span>
+                </div>
+                <div className="row">
+                  <Dropdown className="p-0">
+                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                      {dadosCliente.telefone_tipo || "Selecione o tipo"}
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item
+                        onClick={() =>
+                          setDadosCliente({
+                            ...dadosCliente,
+                            telefone_tipo: "Celular",
+                            telefone_numero: "",
+                          })
+                        }
+                      >
+                        Celular
+                      </Dropdown.Item>
+
+                      <Dropdown.Item
+                        onClick={() =>
+                          setDadosCliente({
+                            ...dadosCliente,
+                            telefone_tipo: "Fixo",
+                            telefone_numero: "",
+                          })
+                        }
+                      >
+                        Fixo
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </div>
+            </div>
+            <div className="row gap-2">
               <div className="col-3 p-0">
                 <div className="row">
                   <Input
@@ -601,7 +694,7 @@ const RegistrarCliente = () => {
                       flex: "1 1 auto",
                     }}
                   >
-                    {endereco.nomeEndereco} {endereco.isFavorito && "★"}
+                    {endereco.nome_endereco} {endereco.favorito && "★"}
                   </div>
                   {/* <div
                     className="col-auto p-0"
@@ -650,9 +743,10 @@ const RegistrarCliente = () => {
               style={{ minHeight: "75px" }}
               onClick={() => {
                 setNovoEndereco({
-                  isCobranca: true,
-                  isEntrega: false,
-                  isFavorito: false,
+                  obs_endereco: "",
+                  endereco_cobranca: true,
+                  endereco_entrega: false,
+                  favorito: false,
                 });
                 setValidacaoCampos({ ...validacaoCampos, endereco: {} });
                 setMostrarPopupEnderecos(true);
@@ -704,7 +798,7 @@ const RegistrarCliente = () => {
                       flex: "1 1 auto",
                     }}
                   >
-                    {cartao.nomeCartao} {cartao.isFavorito && "★"}
+                    {cartao.nome_cartao} {cartao.favorito && "★"}
                   </div>
                   <div
                     className={`${"col-auto px-2"} ${styles.delete_icon}`}
@@ -737,7 +831,7 @@ const RegistrarCliente = () => {
                       flex: "1 1 auto",
                     }}
                   >
-                    {cartao.numeroCartao}
+                    {cartao.numero_cartao}
                   </div>
                 </div>
               </div>
@@ -746,7 +840,9 @@ const RegistrarCliente = () => {
               className={`col-auto ${styles.add_card}`}
               style={{ minHeight: "75px" }}
               onClick={() => {
-                setNovoCartao({});
+                setNovoCartao({
+                  favorito: false,
+                });
                 setValidacaoCampos({ ...validacaoCampos, cartao: {} });
                 setMostrarPopupCartoes(true);
               }}
@@ -772,7 +868,103 @@ const RegistrarCliente = () => {
           <button
             className="btn btn-outline"
             onClick={() => {
-              navigate(-1);
+              setDadosCliente({
+                nome_cliente: "Maria Oliveira",
+                genero: "Feminino",
+                cpf: "321.654.987-00",
+                data_nascimento: "05/08/1997",
+                email: "maria.oliveira@example.com",
+                telefone_ddd: "21",
+                telefone_numero: "99876-4321",
+                telefone_tipo: "Celular",
+                senha: "Maria2025@",
+                cliente_ativo: true,
+                enderecos: [
+                  {
+                    endereco_cobranca: true,
+                    endereco_entrega: true,
+                    favorito: true,
+                    cep: "22041-001",
+                    nome_endereco: "Apartamento Copacabana",
+                    pais: "Brasil",
+                    cidade: "Rio de Janeiro",
+                    logradouro: "Av. Atlântica",
+                    numero: "2000",
+                    estado: "RJ",
+                    bairro: "Copacabana",
+                    tipo_logradouro: "Avenida",
+                    tipo_residencia: "Apartamento",
+                    obs_endereco: "Frente para a praia",
+                  },
+                ],
+                cartoes: [
+                  {
+                    favorito: true,
+                    nome_cartao: "Cartão Principal",
+                    numero_cartao: "5555.4444.3333.2222",
+                    nome_impresso: "Maria Oliveira",
+                    codigo_seguranca: "456",
+                    id_bandeira: 2,
+                  },
+                ],
+              });
+              setSenhaParaConfirmar("Maria2025@");
+            }}
+          >
+            TESTE 1
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={() => {
+              setDadosCliente({
+                nome_cliente: "João Silva",
+                genero: "Masculino",
+                cpf: "987.654.321-11",
+                data_nascimento: "22/03/1995",
+                email: "joao.silva@example.com",
+                telefone_ddd: "11",
+                telefone_numero: "91234-5678",
+                telefone_tipo: "Celular",
+                senha: "Joao2025@",
+                cliente_ativo: false,
+                enderecos: [
+                  {
+                    endereco_cobranca: true,
+                    endereco_entrega: true,
+                    favorito: true,
+                    cep: "04055-001",
+                    nome_endereco: "Casa Vila Mariana",
+                    pais: "Brasil",
+                    cidade: "São Paulo",
+                    logradouro: "Rua Domingos de Morais",
+                    numero: "1234",
+                    estado: "SP",
+                    bairro: "Vila Mariana",
+                    tipo_logradouro: "Rua",
+                    tipo_residencia: "Casa",
+                    obs_endereco: "Próximo ao metrô",
+                  },
+                ],
+                cartoes: [
+                  {
+                    favorito: true,
+                    nome_cartao: "Cartão Reserva",
+                    numero_cartao: "4111.2222.3333.4444",
+                    nome_impresso: "João Silva",
+                    codigo_seguranca: "789",
+                    id_bandeira: 1,
+                  },
+                ],
+              });
+              setSenhaParaConfirmar("Joao2025@");
+            }}
+          >
+            TESTE 2
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={() => {
+              navigate("/clientes");
             }}
           >
             Cancelar
@@ -808,12 +1000,12 @@ const RegistrarCliente = () => {
               </div>
               <div className="row">
                 <Input
-                  value={novoEndereco.nomeEndereco}
-                  isCorrect={validacaoCampos.endereco.nomeEndereco}
+                  value={novoEndereco.nome_endereco}
+                  isCorrect={validacaoCampos.endereco.nome_endereco}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
-                      nomeEndereco: value,
+                      nome_endereco: value,
                     });
                   }}
                 />
@@ -828,12 +1020,12 @@ const RegistrarCliente = () => {
               </div>
               <div className="row">
                 <Input
-                  value={novoEndereco.tipoResidencia}
-                  isCorrect={validacaoCampos.endereco.tipoResidencia}
+                  value={novoEndereco.tipo_residencia}
+                  isCorrect={validacaoCampos.endereco.tipo_residencia}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
-                      tipoResidencia: value,
+                      tipo_residencia: value,
                     });
                   }}
                 />
@@ -848,12 +1040,12 @@ const RegistrarCliente = () => {
               </div>
               <div className="row">
                 <Input
-                  value={novoEndereco.tipoLogradouro}
-                  isCorrect={validacaoCampos.endereco.tipoLogradouro}
+                  value={novoEndereco.tipo_logradouro}
+                  isCorrect={validacaoCampos.endereco.tipo_logradouro}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
-                      tipoLogradouro: value,
+                      tipo_logradouro: value,
                     });
                   }}
                 />
@@ -875,6 +1067,26 @@ const RegistrarCliente = () => {
                     setNovoEndereco({
                       ...novoEndereco,
                       cep: value,
+                    });
+                  }}
+                  onBlur={async () => {
+                    const cepData = await fetchCepData(novoEndereco.cep);
+                    if (cepData.erro) {
+                      setValidacaoCampos({
+                        ...validacaoCampos,
+                        endereco: {
+                          ...validacaoCampos.endereco,
+                          cep: false,
+                        },
+                      });
+                    }
+                    setNovoEndereco({
+                      ...novoEndereco,
+                      pais: cepData.erro ? "" : "Brasil",
+                      estado: cepData.uf || "",
+                      cidade: cepData.localidade || "",
+                      bairro: cepData.bairro || "",
+                      logradouro: cepData.logradouro || "",
                     });
                   }}
                 />
@@ -1011,11 +1223,11 @@ const RegistrarCliente = () => {
               <div className="row label ps-2">Observação:</div>
               <div className="row">
                 <Input
-                  value={novoEndereco.observacoes}
+                  value={novoEndereco.obs_endereco}
                   onChange={(value) => {
                     setNovoEndereco({
                       ...novoEndereco,
-                      observacoes: value,
+                      obs_endereco: value,
                     });
                   }}
                 />
@@ -1028,33 +1240,33 @@ const RegistrarCliente = () => {
           >
             Cobrança:
             <SwitchButton
-              checked={novoEndereco.isCobranca}
+              checked={novoEndereco.endereco_cobranca}
               onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
-                  isCobranca: !novoEndereco.isCobranca,
-                  isEntrega: true,
+                  endereco_cobranca: !novoEndereco.endereco_cobranca,
+                  endereco_entrega: true,
                 });
               }}
             />
             Entrega:
             <SwitchButton
-              checked={novoEndereco.isEntrega}
+              checked={novoEndereco.endereco_entrega}
               onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
-                  isEntrega: !novoEndereco.isEntrega,
-                  isCobranca: true,
+                  endereco_entrega: !novoEndereco.endereco_entrega,
+                  endereco_cobranca: true,
                 });
               }}
             />
             Favorito:
             <SwitchButton
-              checked={novoEndereco.isFavorito}
+              checked={novoEndereco.favorito}
               onChange={() => {
                 setNovoEndereco({
                   ...novoEndereco,
-                  isFavorito: !novoEndereco.isFavorito,
+                  favorito: !novoEndereco.favorito,
                 });
               }}
             />
@@ -1078,43 +1290,35 @@ const RegistrarCliente = () => {
         >
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2">
-                Nome do Cartão:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
               <div className="row ">
                 <Input
-                  value={novoCartao.nomeCartao}
-                  isCorrect={validacaoCampos.cartao.nomeCartao}
+                  label={"Nome do Cartão:"}
+                  isRequired={true}
+                  value={novoCartao.nome_cartao}
+                  isCorrect={validacaoCampos.cartao.nome_cartao}
                   onChange={(value) => {
                     setNovoCartao({
                       ...novoCartao,
-                      nomeCartao: value,
+                      nome_cartao: value,
                     });
                   }}
                 />
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2">
-                Número do Cartão:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
               <div className="row">
                 <Input
-                  value={novoCartao.numeroCartao}
+                  label={"Número do Cartão:"}
+                  isRequired={true}
+                  value={novoCartao.numero_cartao}
                   maskType={MasksEnum.CREDIT_CARD}
                   isOnlyNumbers={true}
                   maxLength={16}
-                  isCorrect={validacaoCampos.cartao.numeroCartao}
+                  isCorrect={validacaoCampos.cartao.numero_cartao}
                   onChange={(value) => {
                     setNovoCartao({
                       ...novoCartao,
-                      numeroCartao: value,
+                      numero_cartao: value,
                     });
                   }}
                 />
@@ -1123,42 +1327,34 @@ const RegistrarCliente = () => {
           </div>
           <div className="row gap-2">
             <div className="col">
-              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                Nome Impresso no Cartão:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
               <div className="row">
                 <Input
-                  value={novoCartao.nomeImpresso}
-                  isCorrect={validacaoCampos.cartao.nomeImpresso}
+                  label={"Nome Impresso no Cartão:"}
+                  isRequired={true}
+                  value={novoCartao.nome_impresso}
+                  isCorrect={validacaoCampos.cartao.nome_impresso}
                   onChange={(value) => {
                     setNovoCartao({
                       ...novoCartao,
-                      nomeImpresso: value,
+                      nome_impresso: value,
                     });
                   }}
                 />
               </div>
             </div>
             <div className="col">
-              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                Código de Segurança:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
               <div className="row">
                 <Input
-                  value={novoCartao.codigoSeguranca}
-                  isCorrect={validacaoCampos.cartao.codigoSeguranca}
+                  label={"Código de Segurança:"}
+                  isRequired={true}
+                  value={novoCartao.codigo_seguranca}
+                  isCorrect={validacaoCampos.cartao.codigo_seguranca}
                   isOnlyNumbers={true}
                   maxLength={3}
                   onChange={(value) => {
                     setNovoCartao({
                       ...novoCartao,
-                      codigoSeguranca: value,
+                      codigo_seguranca: value,
                     });
                   }}
                 />
@@ -1174,42 +1370,27 @@ const RegistrarCliente = () => {
               <div className="row">
                 <Dropdown className="col p-0">
                   <Dropdown.Toggle variant="success" id="dropdown-basic">
-                    {novoCartao.bandeira || "Selecione a bandeira"}
+                    {bandeiras.find(
+                      (bandeira) =>
+                        bandeira.id_bandeira === novoCartao.id_bandeira
+                    )?.nome_bandeira || "Selecione a bandeira"}
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item
-                      onClick={() =>
-                        setNovoCartao({
-                          ...novoCartao,
-                          bandeira: "MasterCard",
-                        })
-                      }
-                    >
-                      MasterCard
-                    </Dropdown.Item>
-
-                    <Dropdown.Item
-                      onClick={() =>
-                        setNovoCartao({
-                          ...novoCartao,
-                          bandeira: "VISA",
-                        })
-                      }
-                    >
-                      VISA
-                    </Dropdown.Item>
-
-                    <Dropdown.Item
-                      onClick={() =>
-                        setNovoCartao({
-                          ...novoCartao,
-                          bandeira: "Elo",
-                        })
-                      }
-                    >
-                      Elo
-                    </Dropdown.Item>
+                    {bandeiras &&
+                      bandeiras.map((bandeira, index) => (
+                        <Dropdown.Item
+                          key={index}
+                          onClick={() =>
+                            setNovoCartao({
+                              ...novoCartao,
+                              id_bandeira: bandeira.id_bandeira,
+                            })
+                          }
+                        >
+                          {bandeira.nome_bandeira}
+                        </Dropdown.Item>
+                      ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
@@ -1223,11 +1404,11 @@ const RegistrarCliente = () => {
               >
                 Favorito:
                 <SwitchButton
-                  checked={novoCartao.isFavorito}
+                  checked={novoCartao.favorito}
                   onChange={() => {
                     setNovoCartao({
                       ...novoCartao,
-                      isFavorito: !novoCartao.isFavorito,
+                      favorito: !novoCartao.favorito,
                     });
                   }}
                 />
