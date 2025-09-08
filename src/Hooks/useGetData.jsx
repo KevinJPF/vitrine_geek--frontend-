@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-export const useFetchData = () => {
+export const useGetData = () => {
   const [data, setData] = useState(null);
 
-  const fetchApiData = async (endpoint, query) => {
+  const getApiData = async (endpoint, query) => {
     try {
       const url = `http://localhost:3000/${endpoint}?${query}`;
 
@@ -21,5 +21,5 @@ export const useFetchData = () => {
     }
   };
 
-  return { fetchApiData, data };
+  return { getApiData, data };
 };

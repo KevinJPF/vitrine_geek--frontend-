@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useCepFetchData } from "../../../Hooks/useCepFetchData";
-import { useFetchData } from "../../../Hooks/useFetchData";
+import { useGetData } from "../../../Hooks/useGetData";
 import { usePostData } from "../../../Hooks/usePostData";
 import { usePutData } from "../../../Hooks/usePutData";
 
@@ -21,7 +21,7 @@ const RegistrarCliente = () => {
   const cliente = state?.cliente; // cliente passado pela tela de listagem
   const navigate = useNavigate();
   const { fetchCepData } = useCepFetchData();
-  const { fetchApiData } = useFetchData();
+  const { getApiData } = useGetData();
   const { postApiData } = usePostData();
   const { putApiData } = usePutData();
 
@@ -97,11 +97,11 @@ const RegistrarCliente = () => {
   // #endregion
 
   useEffect(() => {
-    fetchApiData("cartoes/bandeiras").then((data) => {
+    getApiData("cartoes/bandeiras").then((data) => {
       setBandeiras(data);
     });
     if (!cliente && id) {
-      fetchApiData(`clientes/${id}`).then((data) => {
+      getApiData(`clientes/${id}`).then((data) => {
         console.log(data.message);
         if (data.message) navigate("/clientes");
         else setDadosCliente(data);

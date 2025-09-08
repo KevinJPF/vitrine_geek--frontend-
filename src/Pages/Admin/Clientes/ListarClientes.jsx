@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useFetchData } from "../../../Hooks/useFetchData";
+import { useGetData } from "../../../Hooks/useGetData";
 import { usePatchData } from "../../../Hooks/usePatchData";
 
 const ListarClientes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { fetchApiData } = useFetchData();
+  const { getApiData } = useGetData();
   const { patchApiData } = usePatchData();
   const [clientes, setClientes] = useState([]);
 
@@ -25,7 +25,7 @@ const ListarClientes = () => {
   }, [location]);
 
   const fetchClientes = async () => {
-    const result = await fetchApiData("clientes");
+    const result = await getApiData("clientes");
     // console.log(result);
     setClientes(result);
   };

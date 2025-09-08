@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
-import { useFetchData } from "../../Hooks/useFetchData";
+import { useGetData } from "../../Hooks/useGetData";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { fetchApiData } = useFetchData("clientes");
+  const { getApiData } = useGetData("clientes");
   return (
     <div className="container d-flex flex-column justify-content-center align-items-center container bg-blsack">
       <div className="col">
@@ -18,9 +18,9 @@ const Home = () => {
         <button
           className="btn"
           onClick={async () => {
-            const result = await fetchApiData("clientes");
+            const result = await getApiData("clientes");
             console.log(result);
-            const result2 = await fetchApiData("clientes/25");
+            const result2 = await getApiData("clientes/25");
             console.log(result2);
           }}
         >
