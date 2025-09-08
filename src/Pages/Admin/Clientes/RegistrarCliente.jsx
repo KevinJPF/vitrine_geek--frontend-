@@ -94,6 +94,8 @@ const RegistrarCliente = () => {
   const [mostrarPopupEnderecos, setMostrarPopupEnderecos] = useState(false);
   const [mostrarPopupCartoes, setMostrarPopupCartoes] = useState(false);
   const [mostrarAlertaErro, setMostrarAlertaErro] = useState(false);
+  const [mostrarPopupErro, setMostrarPopupErro] = useState(false);
+  const [erro, setErro] = useState({});
   // #endregion
 
   useEffect(() => {
@@ -345,10 +347,21 @@ const RegistrarCliente = () => {
     console.log(dadosCliente);
     if (await validarTodosCamposCliente()) {
       try {
+        let resposta = {};
         if (cliente || id) {
-          await putApiData("clientes", cliente.id_cliente, dadosCliente);
+          resposta = await putApiData(
+            "clientes",
+            cliente.id_cliente,
+            dadosCliente
+          );
         } else {
-          await postApiData("clientes", dadosCliente);
+          resposta = await postApiData("clientes", dadosCliente);
+        }
+        console.log(resposta);
+        if (resposta.campos_invalidos) {
+          setErro(resposta.campos_invalidos);
+          setMostrarPopupErro(true);
+          return;
         }
         navigate("/clientes");
       } catch (error) {
@@ -1415,6 +1428,26 @@ const RegistrarCliente = () => {
               </div>
             </div>
           </div>
+        </div>
+      </PopupModal>
+
+      <PopupModal
+        isOpen={mostrarPopupErro}
+        title={"Erro ao salvar Cartão"}
+        onCancel={() => {
+          setMostrarPopupErro(false);
+        }}
+      >
+        <div
+          className="col d-flex flex-column gap-3"
+          style={{ textWrap: "nowrap" }}
+        >
+          {erro &&
+            Object.keys(erro).map((campo) => (
+              <div key={campo}>
+                {campo}: {erro[campo]}
+              </div>
+            ))}
         </div>
       </PopupModal>
     </>

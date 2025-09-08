@@ -11,12 +11,16 @@ const PopupModal = ({ isOpen, children, title, onCancel, onConfirm }) => {
           <div className={styles.modal_content}>{children}</div>
         </div>
         <div className={styles.buttons_container}>
-          <button className="btn btn-outline" onClick={onCancel}>
-            Cancelar
-          </button>
-          <button className="btn" onClick={onConfirm}>
-            Confirmar
-          </button>
+          {onCancel && (
+            <button className="btn btn-outline" onClick={onCancel}>
+              Cancelar
+            </button>
+          )}
+          {onConfirm && (
+            <button className="btn" onClick={onConfirm}>
+              Confirmar
+            </button>
+          )}
         </div>
       </div>
     </div>,

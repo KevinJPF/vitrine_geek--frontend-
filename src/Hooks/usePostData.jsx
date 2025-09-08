@@ -13,12 +13,12 @@ export const usePostData = () => {
         body: JSON.stringify(body),
       });
       if (!response.ok) {
-        const errorMessage = await response.text(); // Ler a resposta como texto
+        const errorMessage = await response.json();
         console.error("Error response:", errorMessage);
         return errorMessage;
       }
 
-      const responseData = await response.text(); // Altere para .text() para ler a resposta como string
+      const responseData = await response.json(); // Altere para .text() para ler a resposta como string
       setResponse(responseData);
       return responseData; // Retorne a resposta como string
     } catch (error) {
