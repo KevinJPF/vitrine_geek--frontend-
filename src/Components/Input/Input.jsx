@@ -47,6 +47,7 @@ const Input = ({
   isRequired = false,
   isCorrect = null,
   maskType = MasksEnum.NONE,
+  data_cy = "",
 }) => {
   const applyMask = (value) => {
     switch (maskType) {
@@ -113,6 +114,7 @@ const Input = ({
           } shadow`}
           type={isPassword ? "password" : "text"}
           value={value}
+          data-cy={data_cy}
           onChange={handleChange}
           onFocus={onFocus}
           onBlur={onBlur}
