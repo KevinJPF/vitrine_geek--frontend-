@@ -18,8 +18,8 @@ describe("Cadastro de Cliente com Endereço e Cartão", () => {
     cy.get('[data-cy="input-telefone"]').type("999999999");
     cy.get('[data-cy="dropdown-tipo-telefone"]').click();
     cy.get('[data-cy="dropdown-tipo-telefone-celular"]').click();
-    cy.get('[data-cy="input-senha"]').type("jarvis123");
-    cy.get('[data-cy="input-confirmar-senha"]').type("jarvis123");
+    cy.get('[data-cy="input-senha"]').type("Jarvis123!");
+    cy.get('[data-cy="input-confirmar-senha"]').type("Jarvis123!");
 
     // Adiciona endereço
     cy.get('[data-cy="btn-adicionar-endereco"]').click();
@@ -54,7 +54,7 @@ describe("Cadastro de Cliente com Endereço e Cartão", () => {
     cy.get('[data-cy="btn-confirmar-cliente"]').click();
 
     // Verifica que cliente foi criado
-    // cy.url().should("include", "/clientes");
-    // cy.contains("Tony Stark").should("exist");
+    cy.url().should("include", "/clientes");
+    cy.contains("Tony Stark").should("exist");
   });
 });

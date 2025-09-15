@@ -97,6 +97,7 @@ const ListarClientes = () => {
           {clientes.map((cliente, index) => {
             return (
               <div
+                data-cy="card-cliente"
                 key={index}
                 className="row py-2"
                 style={{
@@ -136,6 +137,7 @@ const ListarClientes = () => {
                   {cliente.cpf}
                 </div>
                 <div
+                  data-cy="status-cliente"
                   className="col-2 label d-flex justify-content-center"
                   style={{
                     color: cliente.cliente_ativo
@@ -148,10 +150,11 @@ const ListarClientes = () => {
                 </div>
                 <div className="col-3 gap-2 d-flex justify-content-center">
                   <button
+                    data-cy="btn-editar-cliente"
                     className="btn btn-inverted"
                     onClick={() => {
                       localStorage.setItem("indexCliente", index);
-                      navigate(`/registrar-cliente/${cliente.id_cliente}`, {
+                      navigate(`/editar-cliente/${cliente.id_cliente}`, {
                         state: { cliente },
                       });
                     }}
@@ -159,6 +162,9 @@ const ListarClientes = () => {
                     Editar
                   </button>
                   <button
+                    data-cy={`btn-${
+                      cliente.cliente_ativo ? "desativar" : "ativar"
+                    }-cliente`}
                     className={`btn ${
                       cliente.cliente_ativo ? "btn-danger" : "btn-green"
                     }`}
