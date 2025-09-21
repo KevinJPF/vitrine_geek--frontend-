@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
 const ListarPedidos = () => {
-  const navigate = useNavigate();
   const [pedidos] = useState([
     {
       numero: "PED-001",
@@ -170,13 +168,6 @@ const ListarPedidos = () => {
             );
           })}
         </div>
-      </div>
-
-      {/* Botão inferior */}
-      <div className="col-auto d-flex justify-content-start py-2">
-        <button className="btn btn-outline" onClick={() => navigate("/")}>
-          Voltar
-        </button>
       </div>
     </div>
   );

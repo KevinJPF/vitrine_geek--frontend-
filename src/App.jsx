@@ -1,31 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./App.css";
+// Clients
+import Header from "./Components/Header/Header";
 import Home from "./Pages/Home/Home";
+import ListagemProdutos from "./Pages/Clients/Produtos/ListagemProdutos";
+import Sobre from "./Pages/Clients/Sobre/Sobre";
+import Carrinho from "./Pages/Clients/Carrinho/Carrinho";
+// Admin
+import SideMenu from "./Components/SideMenu/SideMenu";
+import Dashboard from "./Pages/Admin/Dashboard/Dashboard";
 import ListarClientes from "./Pages/Admin/Clientes/ListarClientes";
 import RegistrarCliente from "./Pages/Admin/Clientes/RegistrarCliente";
-import SideMenu from "./Components/SideMenu/SideMenu";
 import ListarProdutos from "./Pages/Admin/Produtos/ListarProdutos";
 import RegistrarProduto from "./Pages/Admin/Produtos/RegistrarProduto";
-import Dashboard from "./Pages/Admin/Dashboard/Dashboard";
 import ListarPedidos from "./Pages/Admin/ListarPedidos/ListarPedidos";
-import Header from "./Components/Header/Header";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              <Header />
-              <Home />
-            </div>
-          }
-        />
         // #region Admin
         <Route
-          path="/dashboard"
+          path="/admin/dashboard"
           element={
             <div className="row">
               <div className="col-auto p-0">
@@ -38,7 +34,7 @@ function App() {
           }
         />
         <Route
-          path="/clientes"
+          path="/admin/clientes"
           element={
             <div className="row">
               <div className="col-auto p-0">
@@ -50,10 +46,13 @@ function App() {
             </div>
           }
         />
-        <Route path="/registrar-cliente" element={<RegistrarCliente />} />
-        <Route path="/editar-cliente/:id" element={<RegistrarCliente />} />
+        <Route path="/admin/registrar-cliente" element={<RegistrarCliente />} />
         <Route
-          path="/produtos"
+          path="/admin/editar-cliente/:id"
+          element={<RegistrarCliente />}
+        />
+        <Route
+          path="/admin/produtos"
           element={
             <div className="row">
               <div className="col-auto p-0">
@@ -65,9 +64,9 @@ function App() {
             </div>
           }
         />
-        <Route path="/registrar-produto" element={<RegistrarProduto />} />
+        <Route path="/admin/registrar-produto" element={<RegistrarProduto />} />
         <Route
-          path="/pedidos"
+          path="/admin/pedidos"
           element={
             <div className="row">
               <div className="col-auto p-0">
@@ -79,7 +78,45 @@ function App() {
             </div>
           }
         />
-        //#endregion
+        // #endregion
+        <Route
+          path="/"
+          element={
+            <div>
+              <Header />
+              <Home />
+            </div>
+          }
+        />
+        // #region Clientes
+        <Route
+          path="/produtos"
+          element={
+            <div>
+              <Header />
+              <ListagemProdutos />
+            </div>
+          }
+        />
+        <Route
+          path="/sobre"
+          element={
+            <div>
+              <Header />
+              <Sobre />
+            </div>
+          }
+        />
+        <Route
+          path="/carrinho"
+          element={
+            <div>
+              <Header />
+              <Carrinho />
+            </div>
+          }
+        />
+        // #endregion
       </Routes>
     </BrowserRouter>
   );

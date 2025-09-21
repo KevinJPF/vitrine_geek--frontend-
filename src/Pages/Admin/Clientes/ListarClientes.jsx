@@ -154,7 +154,7 @@ const ListarClientes = () => {
                     className="btn btn-inverted"
                     onClick={() => {
                       localStorage.setItem("indexCliente", index);
-                      navigate(`/editar-cliente/${cliente.id_cliente}`, {
+                      navigate(`/admin/editar-cliente/${cliente.id_cliente}`, {
                         state: { cliente },
                       });
                     }}
@@ -188,19 +188,11 @@ const ListarClientes = () => {
           })}
         </div>
       </div>
-      <div className="col-auto d-flex justify-content-between py-2">
-        <button
-          className="btn btn-outline"
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          Voltar
-        </button>
+      <div className="col-auto d-flex justify-content-end py-2">
         <button
           className="btn"
           onClick={async () => {
-            await navigate("/registrar-cliente");
+            await navigate("/admin/registrar-cliente");
           }}
         >
           Adicionar

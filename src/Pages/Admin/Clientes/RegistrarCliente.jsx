@@ -110,7 +110,7 @@ const RegistrarCliente = () => {
     if (!cliente && id) {
       getApiData(`clientes/${id}`).then((data) => {
         console.log(data.message);
-        if (data.message) navigate("/clientes");
+        if (data.message) navigate("/admin/clientes");
         else setDadosCliente(data);
       });
     }
@@ -369,7 +369,7 @@ const RegistrarCliente = () => {
           setMostrarPopupErro(true);
           return;
         }
-        navigate("/clientes");
+        navigate("/admin/clientes");
       } catch (error) {
         console.log(error);
       }
@@ -597,7 +597,7 @@ const RegistrarCliente = () => {
             data-cy="btn-cancelar-cliente"
             className="btn btn-outline"
             onClick={() => {
-              navigate("/clientes");
+              navigate("/admin/clientes");
             }}
           >
             Cancelar

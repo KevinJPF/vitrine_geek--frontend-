@@ -181,11 +181,11 @@ const ListarProdutos = () => {
       </div>
 
       {/* Botões inferiores */}
-      <div className="col-auto d-flex justify-content-between py-2">
-        <button className="btn btn-outline" onClick={() => navigate("/")}>
-          Voltar
-        </button>
-        <button className="btn" onClick={() => navigate("/registrar-produto")}>
+      <div className="col-auto d-flex justify-content-end py-2">
+        <button
+          className="btn"
+          onClick={() => navigate("/admin/registrar-produto")}
+        >
           Adicionar
         </button>
       </div>

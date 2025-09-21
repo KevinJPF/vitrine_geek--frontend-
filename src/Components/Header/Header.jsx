@@ -1,7 +1,9 @@
 import styles from "./Header.module.css";
 import Input from "../Input/Input";
+import { useNavigate } from "react-router";
 
 const Header = () => {
+  const navigate = useNavigate();
   return (
     <div
       className={`row align-items-center mx-2 my-2 py-1 rounded-1`}
@@ -9,10 +11,38 @@ const Header = () => {
     >
       <div className="col">
         <div className="row">
-          <div className={`col-auto mx-4 label ${styles.button}`}>Início</div>
-          <div className={`col-auto mx-4 label ${styles.button}`}>Produtos</div>
-          <div className={`col-auto mx-4 label ${styles.button}`}>Sobre</div>
-          <div className={`col-auto mx-4 label ${styles.button}`}>Login</div>
+          <div
+            className={`col-auto mx-4 label ${styles.button}`}
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            Início
+          </div>
+          <div
+            className={`col-auto mx-4 label ${styles.button}`}
+            onClick={() => {
+              navigate("/produtos");
+            }}
+          >
+            Produtos
+          </div>
+          <div
+            className={`col-auto mx-4 label ${styles.button}`}
+            onClick={() => {
+              navigate("/sobre");
+            }}
+          >
+            Sobre
+          </div>
+          <div
+            className={`col-auto mx-4 label ${styles.button}`}
+            onClick={() => {
+              navigate("/admin/dashboard");
+            }}
+          >
+            Login
+          </div>
         </div>
       </div>
       <div className={`col-auto mx-4 text-center rounded-1 ${styles.logo}`}>

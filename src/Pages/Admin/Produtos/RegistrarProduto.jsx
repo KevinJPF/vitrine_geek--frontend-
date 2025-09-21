@@ -205,7 +205,7 @@ const RegistrarProduto = () => {
         state?.produto ? "editProduto" : "novoProduto",
         JSON.stringify(dadosProduto)
       );
-      navigate(-1);
+      navigate("/admin/produtos");
     } else {
       setMostrarAlertaErro(true);
     }
@@ -613,7 +613,7 @@ const RegistrarProduto = () => {
           <button
             className="btn btn-outline"
             onClick={() => {
-              navigate(-1);
+              navigate("/admin/produtos");
             }}
           >
             Cancelar

@@ -17,33 +17,41 @@ const SideMenu = () => {
       </div>
       <div
         className={`row p-2 ${styles.menu_item} ${
-          isActive("/dashboard") ? styles.active : ""
+          isActive("/admin/dashboard") ? styles.active : ""
         }`}
-        onClick={() => !isActive("/dashboard") && navigate("/dashboard")}
+        onClick={() =>
+          !isActive("/admin/dashboard") && navigate("/admin/dashboard")
+        }
       >
         Dashboard
       </div>
       <div
         className={`row p-2 ${styles.menu_item} ${
-          isActive("/clientes") ? styles.active : ""
+          isActive("/admin/clientes") ? styles.active : ""
         }`}
-        onClick={() => !isActive("/clientes") && navigate("/clientes")}
+        onClick={() =>
+          !isActive("/admin/clientes") && navigate("/admin/clientes")
+        }
       >
         Clientes
       </div>
       <div
         className={`row p-2 ${styles.menu_item} ${
-          isActive("/produtos") ? styles.active : ""
+          isActive("/admin/produtos") ? styles.active : ""
         }`}
-        onClick={() => !isActive("/produtos") && navigate("/produtos")}
+        onClick={() =>
+          !isActive("/admin/produtos") && navigate("/admin/produtos")
+        }
       >
         Produtos
       </div>
       <div
         className={`row p-2 ${styles.menu_item} ${
-          isActive("/pedidos") ? styles.active : ""
+          isActive("/admin/pedidos") ? styles.active : ""
         }`}
-        onClick={() => !isActive("/pedidos") && navigate("/pedidos")}
+        onClick={() =>
+          !isActive("/admin/pedidos") && navigate("/admin/pedidos")
+        }
       >
         Pedidos
       </div>
