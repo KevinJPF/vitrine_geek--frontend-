@@ -409,6 +409,7 @@ const RegistrarCliente = () => {
             <div className="row px-3 py-2 overflow-x-auto overflow-y-hidden gap-2">
               {dadosCliente.enderecos.map((endereco, index) => (
                 <div
+                  data-cy="card-endereco"
                   key={index}
                   className={`col-auto ${styles.endereco_card}`}
                   onClick={() => {
@@ -499,6 +500,7 @@ const RegistrarCliente = () => {
             <div className="row px-3 py-2 overflow-x-auto overflow-y-hidden gap-2">
               {dadosCliente.cartoes.map((cartao, index) => (
                 <div
+                  data-cy="card-cartao"
                   key={index}
                   className={`col-auto ${styles.cartao_card}`}
                   onClick={() => {

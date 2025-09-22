@@ -1,6 +1,6 @@
 describe("Cadastro de Cliente com Endereço e Cartão", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:5173/registrar-cliente"); // ajuste a rota
+    cy.visit("http://localhost:5173/admin/registrar-cliente"); // ajuste a rota
   });
 
   it("Deve criar cliente com endereço e cartão", () => {

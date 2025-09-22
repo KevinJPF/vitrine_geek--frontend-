@@ -7,7 +7,7 @@ describe("Desativação de Cliente", () => {
     // Encontra o cliente pelo nome e clica em desativar
     cy.contains("Tony Stark")
       .parents('[data-cy="card-cliente"]')
-      .find('[data-cy="btn-desativar-cliente"]')
+      .find('[data-cy="btn-ativar-cliente"]')
       .click();
 
     // Verifica se o cliente aparece como inativo na listagem
