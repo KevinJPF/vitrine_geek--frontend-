@@ -14,6 +14,10 @@ import RegistrarCliente from "./Pages/Admin/Clientes/RegistrarCliente";
 import ListarProdutos from "./Pages/Admin/Produtos/ListarProdutos";
 import RegistrarProduto from "./Pages/Admin/Produtos/RegistrarProduto";
 import ListarPedidos from "./Pages/Admin/ListarPedidos/ListarPedidos";
+import DetalhesProduto from "./Pages/Clients/Produtos/DetalhesProduto/DetalhesProduto";
+import Checkout from "./Pages/Clients/Checkout/Checkout";
+import PedidoConfirmado from "./Pages/Clients/Pedidos/PedidoConfirmado/PedidoConfirmado";
+import ListagemPedidos from "./Pages/Clients/Pedidos/ListagemPedidos/ListagemPedidos";
 
 function App() {
   return (
@@ -99,6 +103,15 @@ function App() {
           }
         />
         <Route
+          path="/detalhes-produto/:id"
+          element={
+            <div>
+              <Header />
+              <DetalhesProduto />
+            </div>
+          }
+        />
+        <Route
           path="/sobre"
           element={
             <div>
@@ -113,6 +126,33 @@ function App() {
             <div>
               <Header />
               <Carrinho />
+            </div>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <div>
+              <Header />
+              <Checkout />
+            </div>
+          }
+        />
+        <Route
+          path="/pedido-confirmado"
+          element={
+            <div>
+              <Header />
+              <PedidoConfirmado />
+            </div>
+          }
+        />
+        <Route
+          path="/meus-pedidos"
+          element={
+            <div>
+              <Header />
+              <ListagemPedidos />
             </div>
           }
         />

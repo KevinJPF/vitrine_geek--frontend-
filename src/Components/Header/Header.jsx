@@ -1,6 +1,8 @@
 import styles from "./Header.module.css";
 import Input from "../Input/Input";
 import { useNavigate } from "react-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -53,7 +55,13 @@ const Header = () => {
           <div className="col-auto p-0">
             <Input />
           </div>
-          <div className="col-auto mx-4">Carrinho</div>
+          <div
+            className={`col-auto mx-4 ${styles.cart_button}`}
+            onClick={() => navigate("/carrinho")}
+          >
+            <FontAwesomeIcon icon={faShoppingBasket} />
+            <span className={`badge ${styles.cart_badge}`}>3</span>
+          </div>
         </div>
       </div>
     </div>

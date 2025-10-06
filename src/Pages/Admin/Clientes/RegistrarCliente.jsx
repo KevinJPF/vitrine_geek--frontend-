@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import styles from "./Clientes.module.css";
-import Input, { MasksEnum } from "../../../Components/Input/Input";
 import PopupModal from "../../../Components/PopupModal/PopupModal";
-import SwitchButton from "../../../Components/SwitchButton/SwitchButton";
 import useValidation from "../../../Hooks/useValidation";
-import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +12,7 @@ import { usePostData } from "../../../Hooks/usePostData";
 import { usePutData } from "../../../Hooks/usePutData";
 import FormDadosPessoais from "./Components/FormDadosPessoais";
 import FormDadosCartao from "./Components/FormDadosCartao";
-import SectionHeader from "./Components/SectionHeader";
+import SectionHeader from "../../../Components/Card/SectionHeader";
 import FormDadosEndereco from "./Components/FormDadosEndereco";
 
 const RegistrarCliente = () => {

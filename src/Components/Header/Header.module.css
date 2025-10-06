@@ -1,11 +1,57 @@
 .button {
   user-select: none;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition: 0.1s ease-in-out;
 }
 
 .button:hover {
   scale: 1.1;
+}
+
+.button:active {
+  scale: 1;
+}
+
+.cart_button {
+  position: relative;
+  background-color: var(--secondary);
+  border-radius: 200px;
+  padding: 4px 4px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  transition: 0.1s ease-in-out;
+}
+
+.cart_button svg {
+  color: var(--highlight);
+  transition: 0.1s ease-in-out;
+}
+
+.cart_button:hover {
+  background-color: var(--highlight);
+}
+
+.cart_button:hover svg {
+  color: var(--secondary);
+}
+
+.cart_button:active {
+  background-color: var(--white);
+}
+
+.cart_badge {
+  position: absolute;
+  background-color: var(--red);
+  top: -4px;
+  right: -4px;
+  font-size: 1rem;
+  padding: 2px 6px;
+  border-radius: 200px;
 }
 
 .logo {
@@ -16,4 +62,3 @@
   cursor: pointer;
   transition: 0.2s ease-in-out;
 }
-    
