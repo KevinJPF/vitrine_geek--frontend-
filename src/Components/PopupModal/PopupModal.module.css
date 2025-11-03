@@ -24,7 +24,7 @@
   color: var(--white);
   max-width: 70vw;
   min-width: 20vw;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .modal_header {

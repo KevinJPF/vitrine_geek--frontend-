@@ -1,9 +1,9 @@
 import React from "react";
 import styles from "./ProductCard.module.css";
 
-const ProductCard = ({ name, image, price, onClick }) => {
+const ProductCard = ({ name, image, price, onClick, dataCy }) => {
   return (
-    <div className={styles.product_card} onClick={onClick}>
+    <div className={styles.product_card} onClick={onClick} data-cy={dataCy}>
       <div className={styles.product_card_img_wrapper}>
         <img
           src={image}

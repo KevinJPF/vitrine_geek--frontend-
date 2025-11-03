@@ -1,0 +1,36 @@
+.endereco_card,
+.cartao_card,
+.add_card {
+  background-color: var(--white);
+  color: var(--secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  width: 25%;
+  transition: 0.2s ease-in-out;
+  box-shadow: 2px 2px 4px #0000004f;
+}
+
+.selected {
+  background-color: var(--primary);
+}
+
+.endereco_card:hover,
+.cartao_card:hover,
+.add_card {
+  background-color: var(--highlight);
+  color: var(--secondary);
+}
+
+.add_card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.endereco_card:active,
+.cartao_card:active,
+.add_card:hover {
+  background-color: var(--white);
+  color: var(--secondary);
+}

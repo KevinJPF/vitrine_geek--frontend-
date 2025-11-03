@@ -1,11 +1,81 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../../../Components/Card/Card";
 import Input from "../../../Components/Input/Input";
 import ItemCarrinho from "./Components/ItemCarrinho";
 import { useNavigate } from "react-router";
+import { useGetData } from "../../../Hooks/useGetData";
+import { usePostData } from "../../../Hooks/usePostData";
+import { usePutData } from "../../../Hooks/usePutData";
 
 const Carrinho = () => {
   const navigate = useNavigate();
+  const { getApiData } = useGetData();
+  const { postApiData } = usePostData();
+  const { putApiData } = usePutData();
+  const [produtos, setProdutos] = useState([]);
+
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  const fetchProdutos = async () => {
+    const result = await getApiData("carrinhos/1");
+    // console.log(result);
+    setProdutos(result);
+  };
+
+  const removeProdutoCarrinho = async (dadosProduto) => {
+    try {
+      let resposta = {};
+      resposta = await postApiData("carrinhos/delete", {
+        produto_id: dadosProduto.produto_id,
+        id_cliente: 1,
+      });
+
+      console.log(resposta);
+      if (resposta.campos_invalidos) {
+        console.log(resposta.campos_invalidos);
+        return;
+      }
+
+      produtos.splice(
+        produtos.findIndex(
+          (produto) => produto.produto_id === dadosProduto.produto_id
+        ),
+        1
+      );
+      setProdutos([...produtos]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const alteraQuantidadeProduto = async (dadosProduto, novaQuantidade) => {
+    try {
+      let resposta = {};
+      resposta = await putApiData(`carrinhos`, dadosProduto.produto_id, {
+        id_produto: dadosProduto.produto_id,
+        id_cliente: 1,
+        quantidade: novaQuantidade,
+        ativo: true,
+      });
+
+      if (resposta.campos_invalidos) {
+        console.log(resposta.campos_invalidos);
+        return;
+      }
+
+      const produtoIndex = produtos.findIndex(
+        (produto) => produto.produto_id === dadosProduto.produto_id
+      );
+      if (produtoIndex !== -1) {
+        produtos[produtoIndex].quantidade = novaQuantidade;
+        setProdutos([...produtos]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div
@@ -27,12 +97,32 @@ const Carrinho = () => {
                 Carrinho
               </div>
               <div className="row d-flex justify-content-center">
-                <ItemCarrinho
-                  name={"Zorua de Hisui (Pokemon)"}
-                  image={"https://i.redd.it/um1dcq0lsl191.jpg"}
-                  value={"89,99"}
-                  quantity={1}
-                />
+                {produtos.map((produto, index) => (
+                  <ItemCarrinho
+                    key={index}
+                    name={produto.nome_produto}
+                    image={produto.url_imagem}
+                    value={(produto.valor_venda * produto.quantidade).toFixed(
+                      2
+                    )}
+                    quantity={produto.quantidade}
+                    onDelete={() => removeProdutoCarrinho(produto)}
+                    onIncreaseQuantity={() => {
+                      if (produto.quantidade < 99)
+                        alteraQuantidadeProduto(
+                          produto,
+                          produto.quantidade + 1
+                        );
+                    }}
+                    onDecreaseQuantity={() => {
+                      if (produto.quantidade > 1)
+                        alteraQuantidadeProduto(
+                          produto,
+                          produto.quantidade - 1
+                        );
+                    }}
+                  />
+                ))}
               </div>
             </div>
             {/* Resumo */}
@@ -49,7 +139,7 @@ const Carrinho = () => {
               >
                 Resumo
               </div>
-              <div
+              {/* <div
                 className="row d-flex justify-content-center"
                 style={{ borderBottom: "2px solid var(--primary)" }}
               >
@@ -61,11 +151,20 @@ const Carrinho = () => {
                   </div>
                 </div>
                 Cupom de Desconto
-              </div>
+              </div> */}
               <div className="row d-flex justify-content-center">
                 <div className="row d-flex justify-content-between px-2 py-1">
                   <div className="col">Subtotal</div>
-                  <div className="col-auto p-0">R$ 0,00</div>
+                  <div className="col-auto p-0">
+                    R${" "}
+                    {produtos
+                      .reduce(
+                        (acc, produto) =>
+                          acc + produto.valor_venda * produto.quantidade,
+                        0
+                      )
+                      .toFixed(2)}
+                  </div>
                 </div>
                 <div className="row d-flex justify-content-between px-2 py-1">
                   <div className="col">Desconto</div>
@@ -73,10 +172,28 @@ const Carrinho = () => {
                 </div>
                 <div className="row d-flex justify-content-between px-2 py-1">
                   <div className="col">Total</div>
-                  <div className="col-auto p-0">R$ 0,00</div>
+                  <div className="col-auto p-0">
+                    R${" "}
+                    {produtos
+                      .reduce(
+                        (acc, produto) =>
+                          acc + produto.valor_venda * produto.quantidade,
+                        0
+                      )
+                      .toFixed(2)}
+                  </div>
                 </div>
                 <div className="row-auto d-flex justify-content-center p-2">
-                  <button className="btn" onClick={() => navigate("/checkout")}>
+                  <button
+                    data-cy="btn-continuar-pagamento"
+                    className={`btn ${
+                      produtos.length <= 0 ? "btn-disabled" : ""
+                    }`}
+                    onClick={() => {
+                      if (produtos.length <= 0) return;
+                      navigate("/checkout");
+                    }}
+                  >
                     Continuar para Pagamento
                   </button>
                 </div>

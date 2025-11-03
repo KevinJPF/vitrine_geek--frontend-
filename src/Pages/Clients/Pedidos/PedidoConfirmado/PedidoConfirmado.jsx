@@ -52,6 +52,7 @@ const PedidoConfirmado = () => {
               Inicio
             </button>
             <button
+              data-cy="btn-meus-pedidos"
               className="btn btn-inverted"
               onClick={() => navigate("/meus-pedidos")}
             >

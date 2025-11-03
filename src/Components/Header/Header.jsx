@@ -40,6 +40,14 @@ const Header = () => {
           <div
             className={`col-auto mx-4 label ${styles.button}`}
             onClick={() => {
+              navigate("/meus-pedidos");
+            }}
+          >
+            Pedidos
+          </div>
+          <div
+            className={`col-auto mx-4 label ${styles.button}`}
+            onClick={() => {
               navigate("/admin/dashboard");
             }}
           >

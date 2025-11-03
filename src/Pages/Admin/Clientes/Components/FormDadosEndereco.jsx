@@ -62,7 +62,6 @@ const FormDadosEndereco = ({
               isCorrect={validacaoCampos.endereco.cep}
               onChange={(value) => handleChange("cep", value)}
               onBlur={async () => {
-                return; // ! desabilitado temporariamente
                 const cepData = await fetchCepData(novoEndereco.cep);
                 if (cepData.erro) {
                   setValidacaoCampos({

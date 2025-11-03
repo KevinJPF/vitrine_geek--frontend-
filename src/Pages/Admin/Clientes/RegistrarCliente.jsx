@@ -430,7 +430,7 @@ const RegistrarCliente = () => {
                         flex: "1 1 auto",
                       }}
                     >
-                      {endereco.nome_endereco} {endereco.favorito && "★"}
+                      {endereco.nome_endereco} {endereco.favorito ? "★" : ""}
                     </div>
                     {/* <div
                     className="col-auto p-0"

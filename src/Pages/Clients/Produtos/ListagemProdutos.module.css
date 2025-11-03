@@ -1,6 +1,12 @@
 .product_grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  padding: 16px 0;
+  /* limite máximo para que os cards não se estiquem ocupando todo o espaço */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+  gap: 0px;
+  padding: 8px 0;
+
+  /* garante que, quando houver poucas colunas, elas fiquem agrupadas no início (à esquerda) */
+  justify-content: start;
+  justify-items: start;
+  align-items: start;
 }
