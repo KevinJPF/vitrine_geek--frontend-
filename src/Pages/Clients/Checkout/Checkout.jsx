@@ -15,9 +15,12 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { getApiData } = useGetData();
   const { postApiData } = usePostData();
+  const { validateRequired, validateCEP, validateCreditCard } = useValidation();
   const [produtos, setProdutos] = useState([]);
   const [cliente, setCliente] = useState({});
-  const { validateRequired, validateCEP, validateCreditCard } = useValidation();
+  const [cupom, setCupom] = useState("");
+  const [appliedCupom, setAppliedCupom] = useState(null);
+  const [descontoAplicado, setDescontoAplicado] = useState(0);
 
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
@@ -35,6 +38,71 @@ const Checkout = () => {
   const fetchBandeiras = async () => {
     const result = await getApiData("cartoes/bandeiras");
     setBandeiras(result);
+  };
+
+  const fetchCupom = async (cupomCodigo) => {
+    if (!cupomCodigo) return;
+    const result = await getApiData(`pedidos/cupom?codigo=${cupomCodigo}`);
+    const cupomObj = Array.isArray(result) ? result[0] : result;
+
+    const validateCupom = (c) => {
+      if (!c) return { valid: false, reason: "Cupom não encontrado." };
+      if (Number(c.ativo) !== 1)
+        return { valid: false, reason: "Cupom inativo." };
+      if (c.quantidade != null && Number(c.quantidade) <= 0)
+        return { valid: false, reason: "Cupom sem usos restantes." };
+      if (
+        c.id_cliente &&
+        cliente?.id_cliente &&
+        Number(c.id_cliente) !== Number(cliente.id_cliente)
+      )
+        return { valid: false, reason: "Cupom vinculado a outro cliente." };
+      if (c.data_validade && new Date(c.data_validade) < new Date())
+        return { valid: false, reason: "Cupom expirado." };
+      return { valid: true };
+    };
+
+    const check = validateCupom(cupomObj);
+    if (!check.valid) {
+      console.warn("Cupom inválido:", check.reason);
+      setAppliedCupom(null);
+      setDescontoAplicado(0);
+      return;
+    }
+
+    // calcula subtotal atual dos produtos (mesma lógica de confirmarPedido)
+    const toNumber = (v) => {
+      if (v == null) return 0;
+      if (typeof v === "number") return v;
+      if (typeof v === "string") {
+        const normalized = v.replace(/\s+/g, "").replace(",", ".");
+        const n = Number(normalized);
+        return Number.isFinite(n) ? n : 0;
+      }
+      return 0;
+    };
+    const subtotal = produtos.reduce(
+      (acc, produto) =>
+        acc +
+        toNumber(produto.valor_venda ?? produto.preco ?? 0) *
+          (Number(produto.quantidade ?? 1) || 1),
+      0
+    );
+
+    // calcula desconto: tipo_cupom_id === 1 => percentual, === 2 => valor fixo
+    let desconto = 0;
+    const valorCupomNum = Number(String(cupomObj.valor).replace(",", ".") || 0);
+    if (Number(cupomObj.tipo_cupom_id) === 1) {
+      desconto = subtotal * (valorCupomNum / 100);
+    } else {
+      desconto = valorCupomNum;
+    }
+    desconto =
+      Math.round(Math.max(0, Math.min(desconto, subtotal)) * 100) / 100;
+
+    setAppliedCupom(cupomObj);
+    setDescontoAplicado(desconto);
+    console.log("Cupom aplicado:", cupomObj.codigo, "desconto:", desconto);
   };
 
   const fetchProdutos = async () => {
@@ -59,7 +127,7 @@ const Checkout = () => {
   const confirmarPedido = async () => {
     try {
       let resposta = {};
-
+      const appliedDiscount = Number(descontoAplicado || 0);
       const toNumber = (v) => {
         if (v == null) return 0;
         if (typeof v === "number") return v;
@@ -108,12 +176,18 @@ const Checkout = () => {
       // Aqui usamos apenas o cartão selecionado e enviamos o valor total para ele.
       const selectedCard =
         cliente.cartoes[selectedCardIndex] ?? cliente.cartoes[0];
+      const valor_desconto = appliedDiscount;
+      const valor_total_final = Math.max(
+        0,
+        Number((totalRounded - valor_desconto).toFixed(2))
+      );
+
       const pagamentosPayload = [
         {
           id_pedido: null,
           id_cartao:
             selectedCard.id_cartao ?? selectedCard.id ?? selectedCard.idCartao,
-          valor_pago: Number(totalRounded.toFixed(2)),
+          valor_pago: Number(valor_total_final.toFixed(2)),
           aprovado: true,
         },
       ];
@@ -124,8 +198,8 @@ const Checkout = () => {
         status_id: 1,
         valor_produtos: Number(totalRounded.toFixed(2)),
         valor_frete: 0,
-        valor_desconto: 0,
-        valor_total: Number(totalRounded.toFixed(2)),
+        valor_desconto: Number(valor_desconto.toFixed(2)),
+        valor_total: Number(valor_total_final.toFixed(2)),
         produtos: produtosPayload,
         pagamentos: pagamentosPayload,
       });
@@ -316,6 +390,7 @@ const Checkout = () => {
     return (
       <>
         <PopupModal
+          modal_data_cy="modal-endereco"
           isOpen={open}
           title={"Selecionar Endereço"}
           cancel_data_cy={"btn-cancelar-endereco"}
@@ -334,7 +409,7 @@ const Checkout = () => {
             <div className="row px-3 py-2 overflow-x-auto overflow-y-hidden gap-2">
               {cliente.enderecos?.map((endereco, index) => (
                 <div
-                  data-cy="card-endereco"
+                  data-cy={`select-endereco-${index}`}
                   key={index}
                   className={`col-auto ${styles.endereco_card} ${
                     selectedAddressIndex === index ? styles.selected : ""
@@ -738,7 +813,9 @@ const Checkout = () => {
                       {produtos
                         .reduce(
                           (acc, produto) =>
-                            acc + produto.valor_venda * produto.quantidade,
+                            acc +
+                            produto.valor_venda * produto.quantidade -
+                            descontoAplicado,
                           0
                         )
                         .toFixed(2)}
@@ -801,8 +878,20 @@ const Checkout = () => {
                 <div className="row d-flex justify-content-between px-2 py-2">
                   <div className="col-auto p-0 pe-2">Cupom de Desconto</div>
                   <div className="col d-flex gap-2">
-                    <Input />
-                    <button className="btn btn-outline">Aplicar</button>
+                    <Input
+                      value={cupom}
+                      data_cy="input-cupom"
+                      onChange={(value) => {
+                        setCupom(value);
+                      }}
+                    />
+                    <button
+                      data-cy="btn-aplicar-cupom"
+                      className="btn btn-outline"
+                      onClick={() => fetchCupom(cupom)}
+                    >
+                      Aplicar
+                    </button>
                   </div>
                 </div>
                 Cupom de Desconto
@@ -822,8 +911,15 @@ const Checkout = () => {
                   </div>
                 </div>
                 <div className="row d-flex justify-content-between px-2 py-1">
-                  <div className="col">Desconto</div>
-                  <div className="col-auto p-0">R$ 0,00</div>
+                  <div className="col">
+                    Desconto {appliedCupom ? `(${appliedCupom.codigo})` : ""}
+                  </div>
+                  <div className="col-auto p-0">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(descontoAplicado)}
+                  </div>
                 </div>
                 <div className="row d-flex justify-content-between px-2 py-1">
                   <div className="col">Total</div>
@@ -832,7 +928,9 @@ const Checkout = () => {
                     {produtos
                       .reduce(
                         (acc, produto) =>
-                          acc + produto.valor_venda * produto.quantidade,
+                          acc +
+                          produto.valor_venda * produto.quantidade -
+                          descontoAplicado,
                         0
                       )
                       .toFixed(2)}

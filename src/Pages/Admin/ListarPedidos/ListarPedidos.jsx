@@ -139,6 +139,7 @@ const ListarPedidos = () => {
           backgroundColor: "var(--primary)",
           color: "var(--white)",
         }}
+        data-cy="tabela-pedidos"
       >
         {/* Cabeçalho da tabela */}
         <div
@@ -176,22 +177,26 @@ const ListarPedidos = () => {
                   borderBottom: "2px solid var(--secondary)",
                   color: "var(--secondary)",
                 }}
+                data-cy={`pedido-row-${index}`}
               >
                 <div
                   className="col-1"
                   style={{ borderRight: "2px solid var(--secondary)" }}
+                  data-cy={`pedido-codigo-${index}`}
                 >
                   {pedido.id_pedido}
                 </div>
                 <div
                   className="col-2"
                   style={{ borderRight: "2px solid var(--secondary)" }}
+                  data-cy={`pedido-comprador-${index}`}
                 >
                   {pedido.nome_cliente}
                 </div>
                 <div
                   className="col-2 text-truncate text-center"
                   style={{ borderRight: "2px solid var(--secondary)" }}
+                  data-cy={`pedido-data-criacao-${index}`}
                 >
                   {format(parseISO(pedido.criado_em), "dd/MM/yy - HH:mm", {
                     locale: ptBR,
@@ -200,6 +205,7 @@ const ListarPedidos = () => {
                 <div
                   className="col-2 text-truncate text-center"
                   style={{ borderRight: "2px solid var(--secondary)" }}
+                  data-cy={`pedido-data-atualizacao-${index}`}
                 >
                   {format(parseISO(pedido.atualizado_em), "dd/MM/yy - HH:mm", {
                     locale: ptBR,
@@ -208,6 +214,7 @@ const ListarPedidos = () => {
                 <div
                   className="col-1"
                   style={{ borderRight: "2px solid var(--secondary)" }}
+                  data-cy={`pedido-valor-${index}`}
                 >
                   R$ {pedido.valor_total}
                 </div>
@@ -217,6 +224,7 @@ const ListarPedidos = () => {
                     color: getStatusColor(pedido.status_nome),
                     borderRight: "2px solid var(--secondary)",
                   }}
+                  data-cy={`pedido-status-${index}`}
                 >
                   <strong>{getStatusText(pedido.status_nome)}</strong>
                 </div>
@@ -232,6 +240,7 @@ const ListarPedidos = () => {
                         ? "btn-disabled"
                         : ""
                     }`}
+                    data-cy={`btn-gerenciar-pedido-${index}`}
                     onClick={() => {
                       if (
                         [
@@ -261,21 +270,24 @@ const ListarPedidos = () => {
           confirm_data_cy={"btn-salvar-status-pedido"}
           onCancel={() => {
             setPopupGerenciarPedido(false);
-            setNovoStatus("");
+            setNovoStatus({ status_id: null, status_nome: "" });
           }}
           onConfirm={async () => {
-            if (!novoStatus) return;
+            if (!novoStatus.status_id) return;
             await alterarStatusPedido(pedidoSelecionado, novoStatus);
             setPopupGerenciarPedido(false);
-            setNovoStatus("");
+            setNovoStatus({ status_id: null, status_nome: "" });
             fetchPedidos();
           }}
         >
-          <div className="col">
+          <div className="col" data-cy="modal-gerenciar-pedido">
             <div className="row justify-content-center">
               <div className="col-auto">
                 Status atual do pedido:{" "}
-                <strong style={{ color: "var(--highlight)" }}>
+                <strong
+                  style={{ color: "var(--highlight)" }}
+                  data-cy="status-atual-pedido"
+                >
                   {getStatusText(pedidoSelecionado?.status_nome)}
                 </strong>
               </div>
@@ -299,7 +311,7 @@ const ListarPedidos = () => {
                           data-cy={`dropdown-status-${status.status_nome.toLowerCase()}`}
                           onClick={() => setNovoStatus(status)}
                         >
-                          {status.status_nome}
+                          {getStatusText(status.status_nome)}
                         </Dropdown.Item>
                       )
                     )}

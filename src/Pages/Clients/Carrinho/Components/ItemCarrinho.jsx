@@ -29,8 +29,12 @@ const ItemCarrinho = ({
               <button className="btn" onClick={onDecreaseQuantity}>
                 -
               </button>
-              {quantity}
-              <button className="btn" onClick={onIncreaseQuantity}>
+              <div data-cy="product-quantity">{quantity}</div>
+              <button
+                data-cy="btn-increase-quantity"
+                className="btn"
+                onClick={onIncreaseQuantity}
+              >
                 +
               </button>
             </div>

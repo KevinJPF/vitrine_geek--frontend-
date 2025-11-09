@@ -6,13 +6,18 @@ const PopupModal = ({
   title,
   onCancel,
   onConfirm,
+  modal_data_cy,
   confirm_data_cy,
   cancel_data_cy,
 }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className={styles.modal_overlay} id="modal-popup">
+    <div
+      className={styles.modal_overlay}
+      id="modal-popup"
+      data-cy={modal_data_cy}
+    >
       <div className={styles.modal}>
         <div className={styles.modal_header}>{title}</div>
         <div className={styles.modal_body}>

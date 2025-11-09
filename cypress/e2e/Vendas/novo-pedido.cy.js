@@ -1,124 +1,104 @@
-describe("Fluxo de compra: listar -> detalhe -> adicionar -> alterar quantidade -> checkout", () => {
-  const base = "http://localhost:5173/produtos";
-
+describe("Fluxo de Venda Completo", () => {
   beforeEach(() => {
-    cy.visit(base);
+    // Configurar interceptadores para as chamadas de API
+    cy.intercept("GET", "**/produtos").as("getProdutos");
+    cy.intercept("POST", "**/carrinhos").as("addCarrinho");
+    cy.intercept("GET", "**/carrinhos/1").as("getCarrinho");
+    cy.intercept("PUT", "**/carrinhos/*").as("updateCarrinho");
+    cy.intercept("GET", "**/meus-pedidos").as("getPedidos");
   });
 
-  it("Deve adicionar um produto ao carrinho, alterar quantidade e seguir para checkout (usando data-cy)", () => {
-    // abre o primeiro card (usa data-cy como no clientes-create)
-    cy.get('[data-cy="card-produto-0"]').click();
+  it("Deve completar o fluxo de venda do início ao fim", () => {
+    // 1. Acessar a página de listagem de produtos
+    cy.visit("http://localhost:5173/produtos");
+    cy.wait("@getProdutos");
 
-    // pega o nome na página de detalhe (prefere data-cy, senão usa h2)
-    cy.get("body").then(($body) => {
-      if ($body.find('[data-cy="detalhe-nome-produto"]').length) {
-        cy.get('[data-cy="detalhe-nome-produto"]')
-          .invoke("text")
-          .as("productName");
-      } else {
-        cy.get("h2").first().invoke("text").as("productName");
-      }
-    });
+    // Verificar se a página de produtos carregou
+    cy.contains("Produtos").should("be.visible");
 
-    // botão adicionar ao carrinho (prefere data-cy)
-    cy.get("body").then(($body) => {
-      if ($body.find('[data-cy="btn-adicionar-carrinho"]').length) {
-        cy.get('[data-cy="btn-adicionar-carrinho"]').click({ force: true });
-      } else {
-        cy.contains("Adicionar ao Carrinho").click({ force: true });
-      }
-    });
+    // 2. Selecionar o primeiro produto
+    cy.get('[data-cy="card-produto-0"]').should("be.visible").click();
 
-    // espera carrinho
-    cy.url({ timeout: 10000 }).should("include", "/carrinho");
+    // Verificar se chegou na página de detalhes
+    cy.url().should("include", "/detalhes-produto/0");
 
-    // verifica produto no carrinho usando o nome capturado
-    // cy.get("@productName").then((name) => {
-    //   cy.contains(name.trim(), { timeout: 10000 }).should("exist");
-    // });
+    // 3. Adicionar produto ao carrinho
+    cy.get('[data-cy="btn-adicionar-ao-carrinho"]')
+      .should("be.visible")
+      .click();
 
-    // // captura subtotal atual (prefere data-cy)
-    // cy.get("body").then(($body) => {
-    //   if ($body.find('[data-cy="subtotal"]').length) {
-    //     cy.get('[data-cy="subtotal"]').invoke("text").as("subtotal1");
-    //   } else {
-    //     cy.contains("Subtotal")
-    //       .parent()
-    //       .invoke("text")
-    //       .then((t) => cy.wrap(t).as("subtotal1"));
-    //   }
-    // });
+    cy.wait("@addCarrinho");
 
-    // // aumenta quantidade do primeiro item (prefere data-cy)
-    // cy.get("body").then(($body) => {
-    //   if ($body.find('[data-cy="btn-aumentar-quantidade-0"]').length) {
-    //     cy.get('[data-cy="btn-aumentar-quantidade-0"]').click({ force: true });
-    //   } else {
-    //     // fallback: achar pelo bloco do produto
-    //     cy.get("@productName").then((name) => {
-    //       cy.contains(name.trim())
-    //         .closest("div")
-    //         .within(() => {
-    //           // tenta botão "+" ou botão com data-cy genérico
-    //           cy.get('[data-cy="btn-quantidade-mais"]')
-    //             .click({ force: true })
-    //             .catch(() => {
-    //               cy.contains("+")
-    //                 .click({ force: true })
-    //                 .catch(() => {
-    //                   // fallback último recurso
-    //                   cy.get("button").contains("+").click({ force: true });
-    //                 });
-    //             });
-    //         });
-    //     });
-    //   }
-    // });
+    // Verificar se foi redirecionado para o carrinho
+    cy.url().should("include", "/carrinho");
+    cy.wait("@getCarrinho");
 
-    // // pequeno wait para UI atualizar
-    // cy.wait(500);
+    // 4. Aumentar a quantidade do produto no carrinho
+    // Encontrar o botão de aumentar quantidade e clicar duas vezes
+    cy.get('[data-cy="btn-increase-quantity"]')
+      .first()
+      .click()
+      .wait("@updateCarrinho");
 
-    // // captura novo subtotal e compara (transforma textos em números)
-    // const parseCurr = (txt) =>
-    //   Number(
-    //     String(txt)
-    //       .replace(/[R$\s\.]/g, "")
-    //       .replace(",", ".") || 0
-    //   );
+    cy.get('[data-cy="btn-increase-quantity"]')
+      .first()
+      .click()
+      .wait("@updateCarrinho");
 
-    // cy.get("body").then(($body) => {
-    //   if ($body.find('[data-cy="subtotal"]').length) {
-    //     cy.get('[data-cy="subtotal"]')
-    //       .invoke("text")
-    //       .then((t2) => {
-    //         cy.get("@subtotal1").then((t1) => {
-    //           expect(parseCurr(t2)).to.be.greaterThan(parseCurr(t1));
-    //         });
-    //       });
-    //   } else {
-    //     cy.contains("Subtotal")
-    //       .parent()
-    //       .invoke("text")
-    //       .then((t2) => {
-    //         cy.get("@subtotal1").then((t1) => {
-    //           expect(parseCurr(t2)).to.be.greaterThan(parseCurr(t1));
-    //         });
-    //       });
-    //   }
-    // });
+    // Verificar se a quantidade foi atualizada (deve estar em 3)
+    cy.get('[data-cy="product-quantity"]').first().should("contain", "3");
 
-    // seguir para checkout (prefere data-cy)
-    cy.get('[data-cy="btn-continuar-pagamento"]').click({ force: true });
+    // 5. Continuar para o checkout
+    cy.get('[data-cy="btn-continuar-pagamento"]')
+      .should("be.visible")
+      .should("not.have.class", "btn-disabled")
+      .click();
 
-    cy.url({ timeout: 5000 }).should("include", "/checkout");
-    // cy.get("@productName").then((name) =>
-    //   cy.contains(name.trim()).should("exist")
-    // );
-    cy.get('[data-cy="btn-finalizar-compra"]').click({ force: true });
-    cy.get('[data-cy="btn-finalizar-compra"]').click({ force: true });
+    // Verificar se chegou na página de checkout
+    cy.url().should("include", "/checkout");
 
-    cy.url({ timeout: 1000 }).should("include", "/pedido-confirmado");
+    // 6. Aplicar cupom de desconto
+    cy.get('[data-cy="input-cupom"]').should("be.visible").type("DESCONTA10");
 
-    cy.get('[data-cy="btn-meus-pedidos"]').click({ force: true });
+    cy.get('[data-cy="btn-aplicar-cupom"]').should("be.visible").click();
+
+    // Verificar se o cupom foi aplicado (deve aparecer na seção de desconto)
+    cy.contains("Desconto").should("be.visible");
+    cy.contains("DESCONTA10").should("be.visible");
+
+    // 7. Alterar endereço de entrega
+    cy.get('[data-cy="btn-mudar-endereco"]').should("be.visible").click();
+
+    // Verificar se o modal de endereços abriu
+    cy.get('[data-cy="modal-endereco"]').should("be.visible");
+
+    // Selecionar um endereço (assumindo que existe pelo menos um)
+    cy.get('[data-cy="select-endereco-1"]').first().click();
+
+    // Verificar se o modal fechou
+    cy.get('[data-cy="modal-endereco"]').should("not.exist");
+
+    // 8. Verificar método de pagamento (opcional - alterar se necessário)
+    cy.get('[data-cy="btn-mudar-pagamento"]').should("be.visible");
+
+    // 9. Finalizar a compra
+    cy.get('[data-cy="btn-finalizar-compra"]').should("be.visible").click();
+
+    // Verificar se foi para a página de confirmação
+    cy.url().should("include", "/pedido-confirmado");
+    cy.contains("Pedido Confirmado").should("be.visible");
+
+    // 10. Ir para a listagem de pedidos
+    cy.get('[data-cy="btn-meus-pedidos"]').should("be.visible").click();
+
+    // Verificar se chegou na página de pedidos
+    cy.url().should("include", "/meus-pedidos");
+    // cy.wait("@getPedidos");
+
+    // Verificar se a listagem de pedidos está visível
+    cy.contains("Meus Pedidos").should("be.visible");
+
+    // Verificar se o pedido recém-criado aparece na lista
+    cy.contains("Pedido #").should("be.visible");
   });
 });

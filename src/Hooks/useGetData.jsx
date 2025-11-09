@@ -5,7 +5,9 @@ export const useGetData = () => {
 
   const getApiData = async (endpoint, query) => {
     try {
-      const url = `http://localhost:3000/${endpoint}?${query}`;
+      const url = `http://localhost:3000/${endpoint}${
+        query ? "?" + query : ""
+      }`;
 
       const response = await fetch(url);
       if (!response.ok) {
