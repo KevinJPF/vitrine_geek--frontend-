@@ -151,129 +151,134 @@ const ListagemPedidos = () => {
               <div className="text-center py-4">Nenhum pedido encontrado.</div>
             )}
 
-            {pedidos.map((pedido) => (
-              <div
-                key={pedido.id_pedido ?? pedido.id ?? pedido.pedido_id}
-                className="mb-3 rounded overflow-hidden"
-                style={{
-                  backgroundColor: "var(--bg)",
-                  border: "1px solid var(--primary)",
-                }}
-              >
-                {/* Cabeçalho do pedido */}
+            {pedidos
+              .slice()
+              .reverse()
+              .map((pedido) => (
                 <div
-                  className="d-flex justify-content-between align-items-center mb-2 p-2"
+                  key={pedido.id_pedido ?? pedido.id ?? pedido.pedido_id}
+                  className="mb-3 rounded overflow-hidden"
                   style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--secondary)",
+                    backgroundColor: "var(--bg)",
+                    border: "1px solid var(--primary)",
                   }}
                 >
-                  <div className="row-auto">
-                    <strong>Pedido #{pedido.id_pedido ?? "-"}</strong>
-                    <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                      {formatDate(pedido.criado_em)}
-                    </div>
-                  </div>
+                  {/* Cabeçalho do pedido */}
                   <div
-                    className="row d-flex align-items-center gap-3"
-                    style={{ textWrap: "nowrap" }}
+                    className="d-flex justify-content-between align-items-center mb-2 p-2"
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--secondary)",
+                    }}
                   >
-                    <div className="col">
-                      <strong>
-                        Status: {getStatusText(pedido.status_nome) ?? "-"}
-                      </strong>
+                    <div className="row-auto">
+                      <strong>Pedido #{pedido.id_pedido ?? "-"}</strong>
                       <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                        {pedido.status_descricao ?? "-"}
+                        {formatDate(pedido.criado_em)}
                       </div>
                     </div>
-                    {pedido.status_nome === "ENTREGUE" && (
+                    <div
+                      className="row d-flex align-items-center gap-3"
+                      style={{ textWrap: "nowrap" }}
+                    >
                       <div className="col">
-                        <button
-                          className="btn btn-highlight"
-                          onClick={() => {
-                            setPedidoParaTroca(pedido);
-                            const sel = {};
-                            (pedido.produtos || []).forEach((p) => {
-                              const key =
-                                p.id ??
-                                p.produto_id ??
-                                `${pedido.id_pedido}_${p.produto_id}`;
-                              sel[key] = false;
-                            });
-                            setProdutosSelecionados(sel);
-                            setMostrarPopupTroca(true);
+                        <strong>
+                          Status: {getStatusText(pedido.status_nome) ?? "-"}
+                        </strong>
+                        <div style={{ fontSize: 12, color: "var(--muted)" }}>
+                          {pedido.status_descricao ?? "-"}
+                        </div>
+                      </div>
+                      {pedido.status_nome === "ENTREGUE" && (
+                        <div className="col">
+                          <button
+                            className="btn btn-highlight"
+                            onClick={() => {
+                              setPedidoParaTroca(pedido);
+                              const sel = {};
+                              (pedido.produtos || []).forEach((p) => {
+                                const key =
+                                  p.id ??
+                                  p.produto_id ??
+                                  `${pedido.id_pedido}_${p.produto_id}`;
+                                sel[key] = false;
+                              });
+                              setProdutosSelecionados(sel);
+                              setMostrarPopupTroca(true);
+                            }}
+                          >
+                            Trocar Itens
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="row-auto text-end">
+                      <div style={{ fontWeight: 600 }}>
+                        {formatCurrency(pedido.valor_total)}
+                      </div>
+                      <div style={{ fontSize: 12, color: "var(--muted)" }}>
+                        Produtos: {formatCurrency(pedido.valor_produtos)} •
+                        Frete: {formatCurrency(pedido.valor_frete)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Itens do pedido (exibir somente dados relevantes) */}
+                  <div>
+                    {Array.isArray(pedido.produtos) &&
+                      pedido.produtos.map((item, index) => (
+                        <div
+                          key={
+                            item.id ??
+                            item.produto_id ??
+                            `${pedido.id_pedido}_${item.produto_id}`
+                          }
+                          className="d-flex align-items-center mb-2 px-2"
+                          style={{
+                            gap: 12,
+                            borderBottom:
+                              index < pedido.produtos.length - 1
+                                ? "1px solid var(--white)"
+                                : "none",
                           }}
                         >
-                          Trocar Itens
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="row-auto text-end">
-                    <div style={{ fontWeight: 600 }}>
-                      {formatCurrency(pedido.valor_total)}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                      Produtos: {formatCurrency(pedido.valor_produtos)} • Frete:{" "}
-                      {formatCurrency(pedido.valor_frete)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Itens do pedido (exibir somente dados relevantes) */}
-                <div>
-                  {Array.isArray(pedido.produtos) &&
-                    pedido.produtos.map((item, index) => (
-                      <div
-                        key={
-                          item.id ??
-                          item.produto_id ??
-                          `${pedido.id_pedido}_${item.produto_id}`
-                        }
-                        className="d-flex align-items-center mb-2 px-2"
-                        style={{
-                          gap: 12,
-                          borderBottom:
-                            index < pedido.produtos.length - 1
-                              ? "1px solid var(--white)"
-                              : "none",
-                        }}
-                      >
-                        <img
-                          src={item.url_imagem}
-                          alt={item.nome_produto}
-                          style={{
-                            width: 64,
-                            height: 64,
-                            objectFit: "cover",
-                            borderRadius: 6,
-                          }}
-                        />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 600 }}>
-                            {item.nome_produto}
+                          <img
+                            src={item.url_imagem}
+                            alt={item.nome_produto}
+                            style={{
+                              width: 64,
+                              height: 64,
+                              objectFit: "cover",
+                              borderRadius: 6,
+                            }}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 600 }}>
+                              {item.nome_produto}
+                            </div>
+                            <div
+                              style={{ fontSize: 13, color: "var(--muted)" }}
+                            >
+                              {item.codigo ? `Cód.: ${item.codigo} • ` : ""}
+                              {item.descricao ? `Desc.: ${item.descricao}` : ""}
+                            </div>
                           </div>
-                          <div style={{ fontSize: 13, color: "var(--muted)" }}>
-                            {item.codigo ? `Cód.: ${item.codigo} • ` : ""}
-                            {item.descricao ? `Desc.: ${item.descricao}` : ""}
+                          <div className="text-end" style={{ minWidth: 120 }}>
+                            <div>{item.quantidade}x</div>
+                            <div style={{ fontSize: 14 }}>
+                              {formatCurrency(
+                                item.valor_unitario ?? item.valor_venda
+                              )}
+                            </div>
+                            <div style={{ fontWeight: 600 }}>
+                              {formatCurrency(item.valor_total)}
+                            </div>
                           </div>
                         </div>
-                        <div className="text-end" style={{ minWidth: 120 }}>
-                          <div>{item.quantidade}x</div>
-                          <div style={{ fontSize: 14 }}>
-                            {formatCurrency(
-                              item.valor_unitario ?? item.valor_venda
-                            )}
-                          </div>
-                          <div style={{ fontWeight: 600 }}>
-                            {formatCurrency(item.valor_total)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </Card>

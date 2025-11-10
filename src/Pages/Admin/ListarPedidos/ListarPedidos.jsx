@@ -167,100 +167,108 @@ const ListarPedidos = () => {
             borderRadius: "0px 0px 16px 16px",
           }}
         >
-          {pedidos.map((pedido, index) => {
-            return (
-              <div
-                key={index}
-                className="row py-2"
-                style={{
-                  backgroundColor: index % 2 === 0 ? "#ffffff10" : "#ffffff1f",
-                  borderBottom: "2px solid var(--secondary)",
-                  color: "var(--secondary)",
-                }}
-                data-cy={`pedido-row-${index}`}
-              >
+          {pedidos
+            .slice()
+            .reverse()
+            .map((pedido, index) => {
+              return (
                 <div
-                  className="col-1"
-                  style={{ borderRight: "2px solid var(--secondary)" }}
-                  data-cy={`pedido-codigo-${index}`}
-                >
-                  {pedido.id_pedido}
-                </div>
-                <div
-                  className="col-2"
-                  style={{ borderRight: "2px solid var(--secondary)" }}
-                  data-cy={`pedido-comprador-${index}`}
-                >
-                  {pedido.nome_cliente}
-                </div>
-                <div
-                  className="col-2 text-truncate text-center"
-                  style={{ borderRight: "2px solid var(--secondary)" }}
-                  data-cy={`pedido-data-criacao-${index}`}
-                >
-                  {format(parseISO(pedido.criado_em), "dd/MM/yy - HH:mm", {
-                    locale: ptBR,
-                  })}
-                </div>
-                <div
-                  className="col-2 text-truncate text-center"
-                  style={{ borderRight: "2px solid var(--secondary)" }}
-                  data-cy={`pedido-data-atualizacao-${index}`}
-                >
-                  {format(parseISO(pedido.atualizado_em), "dd/MM/yy - HH:mm", {
-                    locale: ptBR,
-                  })}
-                </div>
-                <div
-                  className="col-1"
-                  style={{ borderRight: "2px solid var(--secondary)" }}
-                  data-cy={`pedido-valor-${index}`}
-                >
-                  R$ {pedido.valor_total}
-                </div>
-                <div
-                  className="col-2 text-center"
+                  key={index}
+                  className="row py-2"
                   style={{
-                    color: getStatusColor(pedido.status_nome),
-                    borderRight: "2px solid var(--secondary)",
+                    backgroundColor:
+                      index % 2 === 0 ? "#ffffff10" : "#ffffff1f",
+                    borderBottom: "2px solid var(--secondary)",
+                    color: "var(--secondary)",
                   }}
-                  data-cy={`pedido-status-${index}`}
+                  data-cy={`pedido-row-${index}`}
                 >
-                  <strong>{getStatusText(pedido.status_nome)}</strong>
-                </div>
-                <div className="col-2 d-flex justify-content-center">
-                  <button
-                    className={`btn btn-inverted ${
-                      [
-                        "ENTREGUE",
-                        "REPROVADA",
-                        "TROCADO",
-                        "TROCA_RECUSADA",
-                      ].includes(pedido.status_nome)
-                        ? "btn-disabled"
-                        : ""
-                    }`}
-                    data-cy={`btn-gerenciar-pedido-${index}`}
-                    onClick={() => {
-                      if (
+                  <div
+                    className="col-1"
+                    style={{ borderRight: "2px solid var(--secondary)" }}
+                    data-cy={`pedido-codigo-${index}`}
+                  >
+                    {pedido.id_pedido}
+                  </div>
+                  <div
+                    className="col-2"
+                    style={{ borderRight: "2px solid var(--secondary)" }}
+                    data-cy={`pedido-comprador-${index}`}
+                  >
+                    {pedido.nome_cliente}
+                  </div>
+                  <div
+                    className="col-2 text-truncate text-center"
+                    style={{ borderRight: "2px solid var(--secondary)" }}
+                    data-cy={`pedido-data-criacao-${index}`}
+                  >
+                    {format(parseISO(pedido.criado_em), "dd/MM/yy - HH:mm", {
+                      locale: ptBR,
+                    })}
+                  </div>
+                  <div
+                    className="col-2 text-truncate text-center"
+                    style={{ borderRight: "2px solid var(--secondary)" }}
+                    data-cy={`pedido-data-atualizacao-${index}`}
+                  >
+                    {format(
+                      parseISO(pedido.atualizado_em),
+                      "dd/MM/yy - HH:mm",
+                      {
+                        locale: ptBR,
+                      }
+                    )}
+                  </div>
+                  <div
+                    className="col-1"
+                    style={{ borderRight: "2px solid var(--secondary)" }}
+                    data-cy={`pedido-valor-${index}`}
+                  >
+                    R$ {pedido.valor_total}
+                  </div>
+                  <div
+                    className="col-2 text-center"
+                    style={{
+                      color: getStatusColor(pedido.status_nome),
+                      borderRight: "2px solid var(--secondary)",
+                    }}
+                    data-cy={`pedido-status-${index}`}
+                  >
+                    <strong>{getStatusText(pedido.status_nome)}</strong>
+                  </div>
+                  <div className="col-2 d-flex justify-content-center">
+                    <button
+                      className={`btn btn-inverted ${
                         [
                           "ENTREGUE",
                           "REPROVADA",
                           "TROCADO",
                           "TROCA_RECUSADA",
                         ].includes(pedido.status_nome)
-                      )
-                        return;
-                      setPedidoSelecionado(pedido);
-                      setPopupGerenciarPedido(true);
-                    }}
-                  >
-                    Gerenciar
-                  </button>
+                          ? "btn-disabled"
+                          : ""
+                      }`}
+                      data-cy={`btn-gerenciar-pedido-${index}`}
+                      onClick={() => {
+                        if (
+                          [
+                            "ENTREGUE",
+                            "REPROVADA",
+                            "TROCADO",
+                            "TROCA_RECUSADA",
+                          ].includes(pedido.status_nome)
+                        )
+                          return;
+                        setPedidoSelecionado(pedido);
+                        setPopupGerenciarPedido(true);
+                      }}
+                    >
+                      Gerenciar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         <PopupModal
