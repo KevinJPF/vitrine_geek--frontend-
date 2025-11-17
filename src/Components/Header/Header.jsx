@@ -3,6 +3,7 @@ import Input from "../Input/Input";
 import { useNavigate } from "react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
+import ChatbotWidget from "../ChatbotWidget/ChatbotWidget";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Header = () => {
       style={{ backgroundColor: "var(--primary)" }}
     >
       <div className="col">
+        <ChatbotWidget />
         <div className="row">
           <div
             className={`col-auto mx-4 label ${styles.button}`}

@@ -18,6 +18,7 @@ import DetalhesProduto from "./Pages/Clients/Produtos/DetalhesProduto/DetalhesPr
 import Checkout from "./Pages/Clients/Checkout/Checkout";
 import PedidoConfirmado from "./Pages/Clients/Pedidos/PedidoConfirmado/PedidoConfirmado";
 import ListagemPedidos from "./Pages/Clients/Pedidos/ListagemPedidos/ListagemPedidos";
+import ChatbotWidget from "./Components/ChatbotWidget/ChatbotWidget";
 
 function App() {
   return (
@@ -87,6 +88,7 @@ function App() {
           path="/"
           element={
             <div>
+              {/* <ChatbotWidget /> */}
               <Header />
               <Home />
             </div>
