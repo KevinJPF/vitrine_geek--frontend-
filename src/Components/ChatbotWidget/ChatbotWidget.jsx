@@ -10,11 +10,13 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
+      type: "text",
       text: "Olá! Como posso ajudar você hoje?",
       sender: "bot",
       timestamp: new Date(),
     },
   ]);
+
   const [inputValue, setInputValue] = useState("");
   const [showScrollButton, setShowScrollButton] = useState(false);
 
@@ -52,11 +54,17 @@ const ChatbotWidget = () => {
       message: text,
       history: messages.map((m) => ({
         role: m.sender === "user" ? "user" : "assistant",
-        content: m.text,
+        content:
+          m.type === "products"
+            ? JSON.stringify({
+                type: "products",
+                items: m.items,
+              })
+            : m.text ?? "",
       })),
     });
 
-    return resposta.reply;
+    return resposta;
   };
 
   const toggleChat = () => {
@@ -70,6 +78,7 @@ const ChatbotWidget = () => {
 
     const userMessage = {
       id: messages.length + 1,
+      type: "text",
       text: inputValue,
       sender: "user",
       timestamp: new Date(),
@@ -81,23 +90,28 @@ const ChatbotWidget = () => {
     setInputValue("");
 
     try {
-      const botReply = await sendToBackend(messageText);
+      const response = await sendToBackend(messageText);
+      const botReply = response.reply;
 
       const botMessage = {
         id: messages.length + 2,
-        text: botReply,
         sender: "bot",
         timestamp: new Date(),
+        type: botReply.type || "text",
+        text: botReply.type === "text" ? botReply.content : "",
+        items: botReply.type === "products" ? botReply.items : [],
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       const errorMessage = {
         id: messages.length + 2,
+        type: "text",
         text: "Erro ao conectar com o servidor.",
         sender: "bot",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, errorMessage]);
     }
   };
@@ -137,7 +151,41 @@ const ChatbotWidget = () => {
                     : styles.messageBot
                 }`}
               >
-                <div className={styles.messageBubble}>{message.text}</div>
+                <div className={styles.messageBubble}>
+                  {/* TEXTO */}
+                  {(!message.type || message.type === "text") && (
+                    <p>{message.text}</p>
+                  )}
+
+                  {/* PRODUTOS */}
+                  {message.type === "products" && message.items?.length > 0 && (
+                    <div className={styles.productList}>
+                      {message.items.map((item) => (
+                        <div key={item.id} className={styles.productCard}>
+                          <img
+                            src={item.imagem}
+                            className={styles.productImage}
+                            alt={item.nome}
+                          />
+
+                          <div className={styles.productInfo}>
+                            <strong>{item.nome}</strong>
+                            <p>R$ {Number(item.preco).toFixed(2)}</p>
+
+                            <a
+                              className={styles.productButton}
+                              href={item.link}
+                              target="_blank"
+                            >
+                              Ver produto
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <div className={styles.messageTime}>
                   {formatTime(message.timestamp)}
                 </div>
