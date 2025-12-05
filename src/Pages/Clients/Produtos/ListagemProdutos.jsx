@@ -17,7 +17,7 @@ const ListagemProdutos = () => {
 
   const fetchProdutos = async () => {
     const result = await getApiData("produtos");
-    // console.log(result);
+    console.log(result);
     setProdutos(result);
   };
 

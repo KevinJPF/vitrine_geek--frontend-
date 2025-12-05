@@ -17,13 +17,13 @@ const Checkout = () => {
   const { postApiData } = usePostData();
   const { validateRequired, validateCEP, validateCreditCard } = useValidation();
   const [produtos, setProdutos] = useState([]);
+  const [selectedCartoes, setSelectedCartoes] = useState([0]);
   const [cliente, setCliente] = useState({});
   const [cupom, setCupom] = useState("");
   const [appliedCupom, setAppliedCupom] = useState(null);
   const [descontoAplicado, setDescontoAplicado] = useState(0);
 
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
-  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
@@ -118,11 +118,16 @@ const Checkout = () => {
       if (Array.isArray(result.enderecos) && result.enderecos.length > 0) {
         setSelectedAddressIndex(0);
       }
-      if (Array.isArray(result.cartoes) && result.cartoes.length > 0) {
-        setSelectedCardIndex(0);
-      }
     }
   };
+
+  //   const calcularFrete = async (endereco) => {
+  //     const response =
+  //       await fetch(`https://cepcerto.com/ws/json-frete/cep-origem/cep-destino/peso/altura/largura/comprimento/sua-chave
+  // `);
+  //     // Lógica simplificada de cálculo de frete
+  //     return 0;
+  //   };
 
   const confirmarPedido = async () => {
     try {
@@ -174,23 +179,30 @@ const Checkout = () => {
 
       // Monta pagamentos com os campos solicitados (id_pedido, id_cartao, valor_pago, aprovado)
       // Aqui usamos apenas o cartão selecionado e enviamos o valor total para ele.
-      const selectedCard =
-        cliente.cartoes[selectedCardIndex] ?? cliente.cartoes[0];
+      const selectedCards = getSelectedCartoes();
       const valor_desconto = appliedDiscount;
       const valor_total_final = Math.max(
         0,
         Number((totalRounded - valor_desconto).toFixed(2))
       );
 
-      const pagamentosPayload = [
-        {
+      let pagamentosPayload = [];
+      for (const cartao of selectedCards) {
+        pagamentosPayload.push({
           id_pedido: null,
-          id_cartao:
-            selectedCard.id_cartao ?? selectedCard.id ?? selectedCard.idCartao,
-          valor_pago: Number(valor_total_final.toFixed(2)),
+          id_cartao: cartao.id_cartao ?? cartao.id ?? cartao.idCartao,
+          valor_pago: Number(
+            produtos.reduce(
+              (acc, produto) =>
+                acc +
+                produto.valor_venda * produto.quantidade -
+                descontoAplicado,
+              0
+            ) / getSelectedCartoes().length
+          ).toFixed(2),
           aprovado: true,
-        },
-      ];
+        });
+      }
 
       resposta = await postApiData("pedidos", {
         id_cliente: cliente.id_cliente,
@@ -221,9 +233,18 @@ const Checkout = () => {
     return cliente.enderecos[selectedAddressIndex] ?? cliente.enderecos[0];
   };
 
-  const getSelectedCartao = () => {
+  const getSelectedCartoes = () => {
     if (!cliente.cartoes || cliente.cartoes.length === 0) return null;
-    return cliente.cartoes[selectedCardIndex] ?? cliente.cartoes[0];
+    let cartoesToReturn = [];
+    for (let i = 0; i < selectedCartoes.length; i++) {
+      const index = selectedCartoes[i];
+      if (selectedCartoes.includes(index))
+        cartoesToReturn = cartoesToReturn.concat(cliente.cartoes[index]);
+    }
+
+    if (cartoesToReturn.length <= 0) cartoesToReturn = [cliente.cartoes[0]];
+
+    return cartoesToReturn;
   };
 
   // Modal simples para seleção de endereço
@@ -614,7 +635,7 @@ const Checkout = () => {
           isOpen={open}
           title={"Selecionar Cartão"}
           cancel_data_cy={"btn-cancelar-cartao"}
-          onCancel={() => {
+          onConfirm={() => {
             onClose();
           }}
         >
@@ -626,17 +647,22 @@ const Checkout = () => {
               marginTop: 8,
             }}
           >
-            <div className="row px-3 py-2 overflow-x-auto overflow-y-hidden gap-2">
+            <div className="row mx-3 py-2 mb-2 overflow-x-auto overflow-y-hidden gap-2">
               {cliente.cartoes.map((cartao, index) => (
                 <div
                   data-cy="card-cartao"
                   key={index}
                   className={`col-auto ${styles.cartao_card} ${
-                    selectedCardIndex === index ? styles.selected : ""
+                    selectedCartoes.includes(index) ? styles.selected : ""
                   }`}
                   onClick={() => {
-                    setSelectedCardIndex(index);
-                    onClose();
+                    if (!selectedCartoes.includes(index))
+                      setSelectedCartoes([...selectedCartoes, index]);
+                    else
+                      setSelectedCartoes(
+                        selectedCartoes.filter((i) => i !== index)
+                      );
+                    // onClose();
                   }}
                 >
                   <div
@@ -687,6 +713,47 @@ const Checkout = () => {
               >
                 +
               </div>
+            </div>
+            <div className="row mx-3 py-2 overflow-x-auto overflow-y-hidden gap-2 border-top">
+              {getSelectedCartoes() &&
+                getSelectedCartoes().map((cartao, index) => (
+                  <div className="row d-flex align-items-center" key={index}>
+                    <div className="col px-2">
+                      <div className="col">
+                        Pagando com {cartao.nome_cartao} ****.****.****.
+                        {String(cartao.numero_cartao).slice(-4)}
+                      </div>
+                      <div
+                        className="col"
+                        style={{ opacity: 0.7, fontSize: "1.2rem" }}
+                      >
+                        1x sem juros
+                      </div>
+                    </div>
+                    <div className="col-auto">
+                      {/* <Input
+                        value={valoresCartoes[index] || ""}
+                        data_cy="input-cupom"
+                        onChange={(value) => {
+                          setValoresCartoes([
+                            ...valoresCartoes,
+                            (valoresCartoes[index] += value),
+                          ]);
+                        }}
+                      /> */}
+                      R${" "}
+                      {(
+                        produtos.reduce(
+                          (acc, produto) =>
+                            acc +
+                            produto.valor_venda * produto.quantidade -
+                            descontoAplicado,
+                          0
+                        ) / getSelectedCartoes().length
+                      ).toFixed(2)}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         </PopupModal>
@@ -793,35 +860,35 @@ const Checkout = () => {
                     </div>
                   </div>
                 </div>
-                {getSelectedCartao() && (
-                  <div className="row d-flex align-items-center">
-                    <div className="col px-2">
-                      <div className="col">
-                        Pagando com {getSelectedCartao().nome_cartao}{" "}
-                        ****.****.****.
-                        {String(getSelectedCartao().numero_cartao).slice(-4)}
+                {getSelectedCartoes() &&
+                  getSelectedCartoes().map((cartao, index) => (
+                    <div className="row d-flex align-items-center" key={index}>
+                      <div className="col px-2">
+                        <div className="col">
+                          Pagando com {cartao.nome_cartao} ****.****.****.
+                          {String(cartao.numero_cartao).slice(-4)}
+                        </div>
+                        <div
+                          className="col"
+                          style={{ opacity: 0.7, fontSize: "1.2rem" }}
+                        >
+                          1x sem juros
+                        </div>
                       </div>
-                      <div
-                        className="col"
-                        style={{ opacity: 0.7, fontSize: "1.2rem" }}
-                      >
-                        1x sem juros
+                      <div className="col-auto">
+                        R${" "}
+                        {(
+                          produtos.reduce(
+                            (acc, produto) =>
+                              acc +
+                              produto.valor_venda * produto.quantidade -
+                              descontoAplicado,
+                            0
+                          ) / getSelectedCartoes().length
+                        ).toFixed(2)}
                       </div>
                     </div>
-                    <div className="col-auto">
-                      R${" "}
-                      {produtos
-                        .reduce(
-                          (acc, produto) =>
-                            acc +
-                            produto.valor_venda * produto.quantidade -
-                            descontoAplicado,
-                          0
-                        )
-                        .toFixed(2)}
-                    </div>
-                  </div>
-                )}
+                  ))}
               </div>
               {/* Itens */}
               <div
@@ -921,6 +988,21 @@ const Checkout = () => {
                     }).format(descontoAplicado)}
                   </div>
                 </div>
+                {/* <div className="row d-flex justify-content-between px-2 py-1">
+                  <div className="col">Frete</div>
+                  <div className="col-auto p-0">
+                    R${" "}
+                    {produtos
+                      .reduce(
+                        (acc, produto) =>
+                          acc +
+                          produto.valor_venda * produto.quantidade -
+                          descontoAplicado,
+                        0
+                      )
+                      .toFixed(2)}
+                  </div>
+                </div> */}
                 <div className="row d-flex justify-content-between px-2 py-1">
                   <div className="col">Total</div>
                   <div className="col-auto p-0">

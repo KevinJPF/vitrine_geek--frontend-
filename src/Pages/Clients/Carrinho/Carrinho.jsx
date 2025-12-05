@@ -53,7 +53,7 @@ const Carrinho = () => {
   const alteraQuantidadeProduto = async (dadosProduto, novaQuantidade) => {
     try {
       let resposta = {};
-      resposta = await putApiData(`carrinhos`, dadosProduto.produto_id, {
+      resposta = await putApiData(`carrinhos`, 1, {
         id_produto: dadosProduto.produto_id,
         id_cliente: 1,
         quantidade: novaQuantidade,
