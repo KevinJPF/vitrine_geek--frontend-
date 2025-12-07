@@ -18,7 +18,8 @@ import DetalhesProduto from "./Pages/Clients/Produtos/DetalhesProduto/DetalhesPr
 import Checkout from "./Pages/Clients/Checkout/Checkout";
 import PedidoConfirmado from "./Pages/Clients/Pedidos/PedidoConfirmado/PedidoConfirmado";
 import ListagemPedidos from "./Pages/Clients/Pedidos/ListagemPedidos/ListagemPedidos";
-import ChatbotWidget from "./Components/ChatbotWidget/ChatbotWidget";
+import { Toaster } from "react-hot-toast";
+import ListarLogs from "./Pages/Admin/ListarLogs/ListarLogs";
 
 function App() {
   return (
@@ -71,6 +72,10 @@ function App() {
         />
         <Route path="/admin/registrar-produto" element={<RegistrarProduto />} />
         <Route
+          path="/admin/registrar-produto/:id"
+          element={<RegistrarProduto />}
+        />
+        <Route
           path="/admin/pedidos"
           element={
             <div className="row">
@@ -83,24 +88,38 @@ function App() {
             </div>
           }
         />
+        <Route
+          path="/admin/logs"
+          element={
+            <div className="row">
+              <div className="col-auto p-0">
+                <SideMenu />
+              </div>
+              <div className="col">
+                <ListarLogs />
+              </div>
+            </div>
+          }
+        />
         // #endregion
         <Route
           path="/"
           element={
             <div>
-              {/* <ChatbotWidget /> */}
               <Header />
-              <Home />
+              <ListagemProdutos />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
         // #region Clientes
         <Route
-          path="/produtos"
+          path={"/produtos"}
           element={
             <div>
               <Header />
               <ListagemProdutos />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -110,6 +129,7 @@ function App() {
             <div>
               <Header />
               <DetalhesProduto />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -119,6 +139,7 @@ function App() {
             <div>
               <Header />
               <Sobre />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -128,6 +149,7 @@ function App() {
             <div>
               <Header />
               <Carrinho />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -137,6 +159,7 @@ function App() {
             <div>
               <Header />
               <Checkout />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -146,6 +169,7 @@ function App() {
             <div>
               <Header />
               <PedidoConfirmado />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />
@@ -155,6 +179,7 @@ function App() {
             <div>
               <Header />
               <ListagemPedidos />
+              <Toaster position="bottom-right" reverseOrder={false} />
             </div>
           }
         />

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 import styles from "./Produtos.module.css";
 import Input, { MasksEnum } from "../../../Components/Input/Input";
 import PopupModal from "../../../Components/PopupModal/PopupModal";
@@ -9,91 +9,123 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Alert from "react-bootstrap/Alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faImage } from "@fortawesome/free-solid-svg-icons";
+import { useGetData } from "../../../Hooks/useGetData";
+import { usePostData } from "../../../Hooks/usePostData";
+import { usePutData } from "../../../Hooks/usePutData";
+import toast from "react-hot-toast";
 
 const RegistrarProduto = () => {
   // #region Variaveis
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { getApiData } = useGetData();
+  const { postApiData } = usePostData();
+  const { putApiData } = usePutData();
 
   const { validateRequired } = useValidation();
 
   const { state } = useLocation();
-  const produto = state?.produto; // produto passado pela tela de listagem
+  const produto = state?.produto;
+
+  const [categorias, setCategorias] = useState([]);
+  const [gruposPrecificacao, setGruposPrecificacao] = useState([]);
 
   const [dadosProduto, setDadosProduto] = useState({
-    nome: (produto && produto.nome) ?? "",
-    categoria: (produto && produto.categoria) ?? "",
-    preco: (produto && produto.preco) ?? "",
+    id: (produto && produto.id) ?? null,
+    codigo: (produto && produto.codigo) ?? "",
+    nome_produto: (produto && produto.nome_produto) ?? "",
+    fabricante_id: (produto && produto.fabricante_id) ?? null,
+    ano_lancamento: (produto && produto.ano_lancamento) ?? "",
     descricao: (produto && produto.descricao) ?? "",
-    codigoBarras: (produto && produto.codigoBarras) ?? "",
-    grupoPrecificacao: (produto && produto.grupoPrecificacao) ?? "",
-    ativo: (produto && produto.ativo) ?? true,
-    imagens: (produto && produto.imagens) ?? [
-      {
-        nome: "Imagem Principal",
-        url: "https://via.placeholder.com/300x200",
-        isPrincipal: true,
-      },
-    ],
-    opcoes: (produto && produto.opcoes) ?? [
-      {
-        nome: "Tamanho",
-        opcoes: ["P", "M", "G"],
-        obrigatoria: true,
-      },
-    ],
+    codigo_barras: (produto && produto.codigo_barras) ?? "",
+    altura: (produto && produto.altura) ?? "",
+    largura: (produto && produto.largura) ?? "",
+    profundidade: (produto && produto.profundidade) ?? "",
+    peso: (produto && produto.peso) ?? "",
+    grupo_precificacao_id: (produto && produto.grupo_precificacao_id) ?? "",
+    valor_venda: (produto && produto.valor_venda) ?? "",
+    quantidade_disponivel: (produto && produto.quantidade_disponivel) ?? "",
+    ativo: (produto && produto.ativo) ?? 1,
+    categorias: (produto && produto.categorias) ?? [],
+    imagens: (produto && produto.imagens) ?? [],
   });
 
   const [novaImagem, setNovaImagem] = useState({
-    nome: "",
-    url: "",
-    isPrincipal: false,
+    url_imagem: "",
+    ordem: 1,
+    principal: 0,
   });
-
-  const [novaOpcao, setNovaOpcao] = useState({
-    nome: "",
-    opcoes: [],
-    obrigatoria: false,
-  });
-
-  const [novaOpcaoItem, setNovaOpcaoItem] = useState("");
 
   const [validacaoCampos, setValidacaoCampos] = useState({
-    nome: null,
-    categoria: null,
-    preco: null,
+    codigo: null,
+    nome_produto: null,
+    ano_lancamento: null,
     descricao: null,
-    codigoBarras: null,
-    grupoPrecificacao: null,
+    codigo_barras: null,
+    altura: null,
+    largura: null,
+    profundidade: null,
+    peso: null,
+    grupo_precificacao_id: null,
+    valor_venda: null,
+    categorias: null,
     imagem: {},
-    opcao: {},
   });
 
   const [mostrarPopupImagens, setMostrarPopupImagens] = useState(false);
-  const [mostrarPopupOpcoes, setMostrarPopupOpcoes] = useState(false);
   const [mostrarAlertaErro, setMostrarAlertaErro] = useState(false);
 
-  const categoriasProduto = [
-    "Roupas",
-    "Calçados",
-    "Acessórios",
-    "Eletrônicos",
-    "Casa",
-    "Esporte",
-  ];
-  const gruposPrecificacao = ["Básico", "Premium", "Promocional", "Sazonal"];
   // #endregion
 
   // #region Funcoes
+  // Carregar dados ao montar o componente
+  useEffect(() => {
+    const carregarDadosIniciais = async () => {
+      const [categoriasData, gruposPrecificacaoData] = await Promise.all([
+        fetchCategorias(),
+        fetchGruposPrecificacao(),
+      ]);
+
+      setCategorias(categoriasData || []);
+      setGruposPrecificacao(gruposPrecificacaoData || []);
+    };
+
+    carregarDadosIniciais();
+    if (!produto && id) {
+      getApiData(`produtos/${id}`).then((data) => {
+        console.log(data.message);
+        if (data.message) navigate("/admin/produtos");
+        else setDadosProduto(data);
+      });
+    }
+  }, []);
+
+  const fetchCategorias = async () => {
+    try {
+      const result = await getApiData("produtos/categorias");
+      return result;
+    } catch (error) {
+      console.error("Erro ao buscar categorias:", error);
+      return [];
+    }
+  };
+
+  const fetchGruposPrecificacao = async () => {
+    try {
+      const result = await getApiData("produtos/precificacao");
+      return result;
+    } catch (error) {
+      console.error("Erro ao buscar grupos precificacao:", error);
+      return [];
+    }
+  };
+
   const validarTodosCamposImagem = async () => {
     let isInvalido = false;
     let camposInvalidos = { ...validacaoCampos };
 
-    if (!novaImagem.nome || !validateRequired(novaImagem.nome)) {
-      camposInvalidos.imagem.nome = false;
-      isInvalido = true;
-    }
-    if (!novaImagem.url || !validateRequired(novaImagem.url)) {
-      camposInvalidos.imagem.url = false;
+    if (!novaImagem.url_imagem || !validateRequired(novaImagem.url_imagem)) {
+      camposInvalidos.imagem.url_imagem = false;
       isInvalido = true;
     }
 
@@ -114,51 +146,17 @@ const RegistrarProduto = () => {
           };
         });
       } else {
+        const proximaOrdem =
+          Math.max(0, ...dadosProduto.imagens.map((img) => img.ordem || 0)) + 1;
         setDadosProduto({
           ...dadosProduto,
-          imagens: [...dadosProduto.imagens, novaImagem],
+          imagens: [
+            ...dadosProduto.imagens,
+            { ...novaImagem, ordem: proximaOrdem },
+          ],
         });
       }
       setMostrarPopupImagens(false);
-    }
-  };
-
-  const validarTodosCamposOpcao = async () => {
-    let isInvalido = false;
-    let camposInvalidos = { ...validacaoCampos };
-
-    if (!novaOpcao.nome || !validateRequired(novaOpcao.nome)) {
-      camposInvalidos.opcao.nome = false;
-      isInvalido = true;
-    }
-    if (novaOpcao.opcoes.length === 0) {
-      camposInvalidos.opcao.opcoes = false;
-      isInvalido = true;
-    }
-
-    setValidacaoCampos(camposInvalidos);
-    return !isInvalido;
-  };
-
-  const salvarOpcao = async () => {
-    if (await validarTodosCamposOpcao()) {
-      if (novaOpcao.index !== null && novaOpcao.index !== undefined) {
-        setDadosProduto((prev) => {
-          const updatedOpcoes = [...(prev.opcoes || [])];
-          updatedOpcoes[novaOpcao.index] = novaOpcao;
-
-          return {
-            ...prev,
-            opcoes: updatedOpcoes,
-          };
-        });
-      } else {
-        setDadosProduto({
-          ...dadosProduto,
-          opcoes: [...dadosProduto.opcoes, novaOpcao],
-        });
-      }
-      setMostrarPopupOpcoes(false);
     }
   };
 
@@ -166,28 +164,36 @@ const RegistrarProduto = () => {
     let isInvalido = false;
     let camposInvalidos = { ...validacaoCampos };
 
-    if (!validateRequired(dadosProduto.nome)) {
-      camposInvalidos.nome = false;
+    if (!validateRequired(dadosProduto.codigo)) {
+      camposInvalidos.codigo = false;
       isInvalido = true;
     }
-    if (!validateRequired(dadosProduto.categoria)) {
-      camposInvalidos.categoria = false;
-      isInvalido = true;
-    }
-    if (!validateRequired(dadosProduto.preco)) {
-      camposInvalidos.preco = false;
+    if (!validateRequired(dadosProduto.nome_produto)) {
+      camposInvalidos.nome_produto = false;
       isInvalido = true;
     }
     if (!validateRequired(dadosProduto.descricao)) {
       camposInvalidos.descricao = false;
       isInvalido = true;
     }
-    if (!validateRequired(dadosProduto.codigoBarras)) {
-      camposInvalidos.codigoBarras = false;
+    if (!validateRequired(dadosProduto.codigo_barras)) {
+      camposInvalidos.codigo_barras = false;
       isInvalido = true;
     }
-    if (!validateRequired(dadosProduto.grupoPrecificacao)) {
-      camposInvalidos.grupoPrecificacao = false;
+    if (!validateRequired(dadosProduto.quantidade_disponivel)) {
+      camposInvalidos.quantidade_disponivel = false;
+      isInvalido = true;
+    }
+    if (!validateRequired(dadosProduto.valor_venda)) {
+      camposInvalidos.valor_venda = false;
+      isInvalido = true;
+    }
+    if (!validateRequired(dadosProduto.grupo_precificacao_id)) {
+      camposInvalidos.grupo_precificacao_id = false;
+      isInvalido = true;
+    }
+    if (dadosProduto.categorias.length <= 0) {
+      camposInvalidos.categorias = false;
       isInvalido = true;
     }
     if (dadosProduto.imagens.length <= 0) {
@@ -201,33 +207,39 @@ const RegistrarProduto = () => {
 
   const salvarProduto = async () => {
     if (await validarTodosCamposProduto()) {
-      localStorage.setItem(
-        state?.produto ? "editProduto" : "novoProduto",
-        JSON.stringify(dadosProduto)
-      );
+      let resposta = {};
+      if (produto || id) {
+        resposta = await putApiData("produtos", produto.id, dadosProduto);
+      } else {
+        resposta = await postApiData("produtos", dadosProduto);
+      }
+      console.log(resposta);
+      if (resposta.campos_invalidos) {
+        toast.error(resposta.campos_invalidos);
+        return;
+      }
       navigate("/admin/produtos");
     } else {
       setMostrarAlertaErro(true);
     }
   };
 
-  const adicionarOpcaoItem = () => {
-    if (
-      novaOpcaoItem.trim() &&
-      !novaOpcao.opcoes.includes(novaOpcaoItem.trim())
-    ) {
-      setNovaOpcao({
-        ...novaOpcao,
-        opcoes: [...novaOpcao.opcoes, novaOpcaoItem.trim()],
+  const adicionarCategoria = (categoria) => {
+    const jaAdicionada = dadosProduto.categorias.some(
+      (c) => c.id === categoria.id
+    );
+    if (!jaAdicionada) {
+      setDadosProduto({
+        ...dadosProduto,
+        categorias: [...dadosProduto.categorias, categoria],
       });
-      setNovaOpcaoItem("");
     }
   };
 
-  const removerOpcaoItem = (index) => {
-    setNovaOpcao({
-      ...novaOpcao,
-      opcoes: novaOpcao.opcoes.filter((_, i) => i !== index),
+  const removerCategoria = (categoriaId) => {
+    setDadosProduto({
+      ...dadosProduto,
+      categorias: dadosProduto.categorias.filter((c) => c.id !== categoriaId),
     });
   };
   // #endregion
@@ -256,63 +268,51 @@ const RegistrarProduto = () => {
           </div>
           <div className="row px-3 pb-3">
             <div className="row gap-2">
-              <div className="col-4 p-0">
+              <div className="col-1 p-0">
                 <div className="row">
                   <Input
-                    label={"Nome do Produto:"}
+                    label={"Cód.:"}
                     isRequired={true}
-                    value={dadosProduto.nome}
-                    isCorrect={validacaoCampos.nome}
+                    value={dadosProduto.nome_produto}
+                    isCorrect={validacaoCampos.nome_produto}
                     onChange={(value) => {
                       setDadosProduto({
                         ...dadosProduto,
-                        nome: value,
+                        nome_produto: value,
                       });
                     }}
                   />
                 </div>
               </div>
-              <div className="col-auto p-0">
-                <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                  Categoria:
-                  <span className="col ps-1" style={{ color: "var(--red)" }}>
-                    *
-                  </span>
-                </div>
+              <div className="col-4 p-0">
                 <div className="row">
-                  <Dropdown className="p-0">
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                      {dadosProduto.categoria || "Selecione a categoria"}
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                      {categoriasProduto.map((categoria, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          onClick={() =>
-                            setDadosProduto({
-                              ...dadosProduto,
-                              categoria: categoria,
-                            })
-                          }
-                        >
-                          {categoria}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  <Input
+                    label={"Nome do Produto:"}
+                    isRequired={true}
+                    value={dadosProduto.codigo}
+                    isCorrect={validacaoCampos.codigo}
+                    onChange={(value) => {
+                      setDadosProduto({
+                        ...dadosProduto,
+                        codigo: value,
+                      });
+                    }}
+                  />
                 </div>
               </div>
               <div className="col-2 p-0">
                 <div className="row">
                   <Input
-                    label={"Preço (R$):"}
-                    isRequired={true}
-                    maskType={MasksEnum.CURRENCY}
-                    value={dadosProduto.preco}
-                    isCorrect={validacaoCampos.preco}
+                    label={"Ano Lançamento:"}
+                    isRequired={false}
+                    value={dadosProduto.ano_lancamento}
+                    isCorrect={validacaoCampos.ano_lancamento}
+                    isOnlyNumbers={true}
                     onChange={(value) => {
-                      setDadosProduto({ ...dadosProduto, preco: value });
+                      setDadosProduto({
+                        ...dadosProduto,
+                        ano_lancamento: value,
+                      });
                     }}
                   />
                 </div>
@@ -322,13 +322,31 @@ const RegistrarProduto = () => {
                   <Input
                     label={"Código de Barras:"}
                     isRequired={true}
-                    value={dadosProduto.codigoBarras}
-                    isCorrect={validacaoCampos.codigoBarras}
+                    value={dadosProduto.codigo_barras}
+                    isCorrect={validacaoCampos.codigo_barras}
                     isOnlyNumbers={true}
                     onChange={(value) => {
                       setDadosProduto({
                         ...dadosProduto,
-                        codigoBarras: value,
+                        codigo_barras: value,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Quantidade:"}
+                    isRequired={true}
+                    value={dadosProduto.quantidade_disponivel}
+                    isCorrect={validacaoCampos.quantidade_disponivel}
+                    maxLength={5}
+                    isOnlyNumbers={true}
+                    onChange={(value) => {
+                      setDadosProduto({
+                        ...dadosProduto,
+                        quantidade_disponivel: value,
                       });
                     }}
                   />
@@ -336,7 +354,7 @@ const RegistrarProduto = () => {
               </div>
             </div>
             <div className="row gap-2 mt-2">
-              <div className="col-4 p-0">
+              <div className="col-6 p-0">
                 <div className="row">
                   <Input
                     label={"Descrição:"}
@@ -352,6 +370,20 @@ const RegistrarProduto = () => {
                   />
                 </div>
               </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Valor Venda (R$):"}
+                    isRequired={true}
+                    maskType={MasksEnum.CURRENCY}
+                    value={dadosProduto.valor_venda}
+                    isCorrect={validacaoCampos.valor_venda}
+                    onChange={(value) => {
+                      setDadosProduto({ ...dadosProduto, valor_venda: value });
+                    }}
+                  />
+                </div>
+              </div>
               <div className="col-auto p-0">
                 <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                   Grupo de Precificação:
@@ -362,25 +394,94 @@ const RegistrarProduto = () => {
                 <div className="row">
                   <Dropdown className="p-0">
                     <Dropdown.Toggle variant="success" id="dropdown-basic">
-                      {dadosProduto.grupoPrecificacao || "Selecione o grupo"}
+                      {gruposPrecificacao.find(
+                        (g) => g.id === dadosProduto.grupo_precificacao_id
+                      )
+                        ? gruposPrecificacao.find(
+                            (g) => g.id === dadosProduto.grupo_precificacao_id
+                          )?.nome +
+                          " (" +
+                          gruposPrecificacao.find(
+                            (g) => g.id === dadosProduto.grupo_precificacao_id
+                          )?.percentual_lucro +
+                          "%)"
+                        : "Selecione o grupo"}
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                      {gruposPrecificacao.map((grupo, index) => (
+                      {gruposPrecificacao.map((grupo) => (
                         <Dropdown.Item
-                          key={index}
+                          key={grupo.id}
                           onClick={() =>
                             setDadosProduto({
                               ...dadosProduto,
-                              grupoPrecificacao: grupo,
+                              grupo_precificacao_id: grupo.id,
                             })
                           }
                         >
-                          {grupo}
+                          {grupo.nome} {`(${grupo.percentual_lucro}%)`}
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
+                </div>
+              </div>
+            </div>
+            <div className="row gap-2 mt-2">
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Altura (cm):"}
+                    isRequired={false}
+                    maskType={MasksEnum.DECIMAL}
+                    value={dadosProduto.altura}
+                    isCorrect={validacaoCampos.altura}
+                    onChange={(value) => {
+                      setDadosProduto({ ...dadosProduto, altura: value });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Largura (cm):"}
+                    isRequired={false}
+                    maskType={MasksEnum.DECIMAL}
+                    value={dadosProduto.largura}
+                    isCorrect={validacaoCampos.largura}
+                    onChange={(value) => {
+                      setDadosProduto({ ...dadosProduto, largura: value });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Profundidade (cm):"}
+                    isRequired={false}
+                    maskType={MasksEnum.DECIMAL}
+                    value={dadosProduto.profundidade}
+                    isCorrect={validacaoCampos.profundidade}
+                    onChange={(value) => {
+                      setDadosProduto({ ...dadosProduto, profundidade: value });
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="col-2 p-0">
+                <div className="row">
+                  <Input
+                    label={"Peso (g):"}
+                    isRequired={false}
+                    maskType={MasksEnum.DECIMAL}
+                    value={dadosProduto.peso}
+                    isCorrect={validacaoCampos.peso}
+                    onChange={(value) => {
+                      setDadosProduto({ ...dadosProduto, peso: value });
+                    }}
+                  />
                 </div>
               </div>
               <div className="col-auto p-0 d-flex align-items-end">
@@ -389,16 +490,87 @@ const RegistrarProduto = () => {
                   <div className="col">
                     <SwitchButton
                       label="Produto Ativo"
-                      checked={dadosProduto.ativo}
+                      checked={dadosProduto.ativo === 1}
                       onChange={() => {
                         setDadosProduto({
                           ...dadosProduto,
-                          ativo: !dadosProduto.ativo,
+                          ativo: dadosProduto.ativo === 1 ? 0 : 1,
                         });
                       }}
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="row justify-content-center"
+            style={{
+              backgroundColor: "var(--highlight)",
+              borderBottom: `2px solid ${
+                validacaoCampos.categorias === false
+                  ? "var(--red)"
+                  : "var(--secondary)"
+              }`,
+              color:
+                validacaoCampos.categorias === false
+                  ? "var(--red)"
+                  : "var(--secondary)",
+            }}
+          >
+            Categorias do Produto
+          </div>
+          <div className="row px-3 pb-3">
+            <div className="row mt-2">
+              <div className="col d-flex flex-wrap justify-content-center gap-2">
+                {categorias.map((categoria, index) => (
+                  <div
+                    key={index}
+                    className={`col-auto ${styles.cartao_card} ${
+                      dadosProduto.categorias.find((c) => c.id === categoria.id)
+                        ? styles.selected_card
+                        : ""
+                    }`}
+                    onClick={() => {
+                      dadosProduto.categorias.find((c) => c.id === categoria.id)
+                        ? removerCategoria(categoria.id)
+                        : adicionarCategoria(categoria);
+                    }}
+                  >
+                    <div
+                      className="row d-flex m-1 overflow-hidden justify-content-center"
+                      style={{
+                        flexWrap: "nowrap",
+                      }}
+                    >
+                      <div
+                        className="col-auto"
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {categoria.nome}
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div
+                        className="col"
+                        style={{
+                          overflow: "hidden",
+                          textWrap: "nowrap",
+                          textOverflow: "ellipsis",
+                          flex: "1 1 auto",
+                          fontSize: "0.8em",
+                        }}
+                      >
+                        {categoria.descricao}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -447,7 +619,7 @@ const RegistrarProduto = () => {
                     }}
                   >
                     <FontAwesomeIcon icon={faImage} className="me-1" />
-                    {imagem.nome} {imagem.isPrincipal && "★"}
+                    Imagem {imagem.ordem} {imagem.principal === 1 && "★"}
                   </div>
                   <div
                     className={`${"col-auto px-2"} ${styles.delete_icon}`}
@@ -481,7 +653,7 @@ const RegistrarProduto = () => {
                       fontSize: "0.8em",
                     }}
                   >
-                    {imagem.url}
+                    {imagem.url_imagem}
                   </div>
                 </div>
               </div>
@@ -491,104 +663,12 @@ const RegistrarProduto = () => {
               style={{ minHeight: "75px" }}
               onClick={() => {
                 setNovaImagem({
-                  nome: "",
-                  url: "",
-                  isPrincipal: false,
+                  url_imagem: "",
+                  ordem: dadosProduto.imagens.length + 1,
+                  principal: 0,
                 });
                 setValidacaoCampos({ ...validacaoCampos, imagem: {} });
                 setMostrarPopupImagens(true);
-              }}
-            >
-              +
-            </div>
-          </div>
-
-          <div
-            className="row justify-content-center"
-            style={{
-              backgroundColor: "var(--highlight)",
-              borderBottom: "2px solid var(--secondary)",
-              color: "var(--secondary)",
-            }}
-          >
-            Opções de Personalização
-          </div>
-          <div className="row px-3 overflow-x-auto overflow-y-hidden pb-1 gap-2">
-            {dadosProduto.opcoes.map((opcao, index) => (
-              <div
-                key={index}
-                className={`col-auto ${styles.cartao_card}`}
-                onClick={() => {
-                  setNovaOpcao({ ...opcao, index: index });
-                  setValidacaoCampos({ ...validacaoCampos, opcao: {} });
-                  setMostrarPopupOpcoes(true);
-                }}
-              >
-                <div
-                  className="row mt-1 overflow-hidden"
-                  style={{
-                    flexWrap: "nowrap",
-                  }}
-                >
-                  <div
-                    className="col"
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      flex: "1 1 auto",
-                    }}
-                  >
-                    {opcao.nome} {opcao.obrigatoria && "*"}
-                  </div>
-                  <div
-                    className={`${"col-auto px-2"} ${styles.delete_icon}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDadosProduto((prev) => {
-                        const updatedOpcoes = [
-                          ...prev.opcoes.filter(
-                            (_, indexOpcao) => indexOpcao !== index
-                          ),
-                        ];
-
-                        return {
-                          ...prev,
-                          opcoes: updatedOpcoes,
-                        };
-                      });
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faTrash} size="xs" />
-                  </div>
-                </div>
-                <div className="row">
-                  <div
-                    className="col"
-                    style={{
-                      overflow: "hidden",
-                      textWrap: "nowrap",
-                      textOverflow: "ellipsis",
-                      flex: "1 1 auto",
-                      fontSize: "0.8em",
-                    }}
-                  >
-                    {opcao.opcoes.join(", ")}
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div
-              className={`col-auto ${styles.add_card}`}
-              style={{ minHeight: "75px" }}
-              onClick={() => {
-                setNovaOpcao({
-                  nome: "",
-                  opcoes: [],
-                  obrigatoria: false,
-                });
-                setValidacaoCampos({ ...validacaoCampos, opcao: {} });
-                setMostrarPopupOpcoes(true);
               }}
             >
               +
@@ -644,28 +724,6 @@ const RegistrarProduto = () => {
           <div className="row gap-2">
             <div className="col">
               <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                Nome da Imagem:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
-              <div className="row">
-                <Input
-                  value={novaImagem.nome}
-                  isCorrect={validacaoCampos.imagem.nome}
-                  onChange={(value) => {
-                    setNovaImagem({
-                      ...novaImagem,
-                      nome: value,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row gap-2">
-            <div className="col">
-              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
                 URL da Imagem:
                 <span className="col ps-1" style={{ color: "var(--red)" }}>
                   *
@@ -673,12 +731,31 @@ const RegistrarProduto = () => {
               </div>
               <div className="row">
                 <Input
-                  value={novaImagem.url}
-                  isCorrect={validacaoCampos.imagem.url}
+                  value={novaImagem.url_imagem}
+                  isCorrect={validacaoCampos.imagem.url_imagem}
                   onChange={(value) => {
                     setNovaImagem({
                       ...novaImagem,
-                      url: value,
+                      url_imagem: value,
+                    });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="row gap-2">
+            <div className="col-3">
+              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
+                Ordem:
+              </div>
+              <div className="row">
+                <Input
+                  value={novaImagem.ordem}
+                  isOnlyNumbers={true}
+                  onChange={(value) => {
+                    setNovaImagem({
+                      ...novaImagem,
+                      ordem: parseInt(value) || 1,
                     });
                   }}
                 />
@@ -691,116 +768,11 @@ const RegistrarProduto = () => {
           >
             Imagem Principal:
             <SwitchButton
-              checked={novaImagem.isPrincipal}
+              checked={novaImagem.principal === 1}
               onChange={() => {
                 setNovaImagem({
                   ...novaImagem,
-                  isPrincipal: !novaImagem.isPrincipal,
-                });
-              }}
-            />
-          </div>
-        </div>
-      </PopupModal>
-
-      {/* Popup Modal para Opções */}
-      <PopupModal
-        isOpen={mostrarPopupOpcoes}
-        title={"Nova Opção de Personalização"}
-        onCancel={() => {
-          setMostrarPopupOpcoes(false);
-        }}
-        onConfirm={() => {
-          salvarOpcao();
-        }}
-      >
-        <div className="col d-flex flex-column gap-3">
-          <div className="row gap-2">
-            <div className="col">
-              <div className="row label ps-2" style={{ flexWrap: "nowrap" }}>
-                Nome da Opção:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
-              <div className="row">
-                <Input
-                  value={novaOpcao.nome}
-                  isCorrect={validacaoCampos.opcao.nome}
-                  onChange={(value) => {
-                    setNovaOpcao({
-                      ...novaOpcao,
-                      nome: value,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row gap-2">
-            <div className="col">
-              <div className="row label ps-2">Adicionar Item:</div>
-              <div className="row d-flex gap-2">
-                <div className="col">
-                  <Input
-                    value={novaOpcaoItem}
-                    onChange={(value) => {
-                      setNovaOpcaoItem(value);
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        adicionarOpcaoItem();
-                      }
-                    }}
-                  />
-                </div>
-                <div className="col-auto">
-                  <button className="btn btn-sm" onClick={adicionarOpcaoItem}>
-                    Adicionar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              <div className="row label ps-2">
-                Itens da Opção:
-                <span className="col ps-1" style={{ color: "var(--red)" }}>
-                  *
-                </span>
-              </div>
-              <div className="row">
-                <div className="col d-flex flex-wrap gap-1">
-                  {novaOpcao.opcoes.map((item, index) => (
-                    <span
-                      key={index}
-                      className="badge bg-secondary d-flex align-items-center gap-1"
-                      style={{ cursor: "pointer" }}
-                    >
-                      {item}
-                      <FontAwesomeIcon
-                        icon={faTrash}
-                        size="xs"
-                        onClick={() => removerOpcaoItem(index)}
-                      />
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="row mt-2 gap-2 justify-content-center align-items-center bg-white rounded-pill"
-            style={{ color: "var(--secondary)", flexWrap: "nowrap" }}
-          >
-            Opção Obrigatória:
-            <SwitchButton
-              checked={novaOpcao.obrigatoria}
-              onChange={() => {
-                setNovaOpcao({
-                  ...novaOpcao,
-                  obrigatoria: !novaOpcao.obrigatoria,
+                  principal: novaImagem.principal === 1 ? 0 : 1,
                 });
               }}
             />

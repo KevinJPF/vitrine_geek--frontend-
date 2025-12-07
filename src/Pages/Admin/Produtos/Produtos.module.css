@@ -10,10 +10,24 @@
   box-shadow: 2px 2px 4px #0000004f;
 }
 
+.cartao_card {
+  width: 10%;
+}
+
+.selected_card {
+  background-color: var(--highlight);
+  color: var(--secondary);
+}
+
 .endereco_card:hover,
 .cartao_card:hover,
 .add_card {
   background-color: var(--highlight);
+  color: var(--secondary);
+}
+
+.selected_card:hover {
+  background-color: var(--white);
   color: var(--secondary);
 }
 

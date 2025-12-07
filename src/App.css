@@ -96,6 +96,45 @@ body {
   opacity: 0.6;
 }
 
+.checkbox-custom {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--secondary);
+  margin: 0;
+  font: inherit;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.checkbox-custom:hover {
+  border-color: var(--primary);
+}
+
+.checkbox-custom:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox-custom::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  transform: scale(0);
+  transition: 0.15s ease-in-out;
+  box-shadow: inset 1em 1em white;
+  clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 20%, 80% 0, 35% 55%);
+}
+
+.checkbox-custom:checked::before {
+  transform: scale(1);
+}
+
 .card {
   background-color: var(--secondary);
   color: var(--white);

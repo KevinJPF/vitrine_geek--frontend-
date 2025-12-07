@@ -55,13 +55,14 @@ const SideMenu = () => {
       >
         Pedidos
       </div>
-      {/* <div
+      <div
         className={`row p-2 ${styles.menu_item} ${
-          isActive("/logs") ? styles.active : ""
+          isActive("/admin/logs") ? styles.active : ""
         }`}
+        onClick={() => !isActive("/admin/logs") && navigate("/admin/logs")}
       >
         Logs de Transação
-      </div> */}
+      </div>
       <div
         className={`row p-2 ${styles.menu_item} ${styles.exit}`}
         onClick={() => !isActive("/") && navigate("/")}

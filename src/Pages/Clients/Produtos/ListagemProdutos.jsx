@@ -29,28 +29,34 @@ const ListagemProdutos = () => {
       <Card cardName={"Produtos"}>
         <div className="col overflow-auto h-100">
           <div className={styles.product_grid}>
-            {produtos.map((produto, index) => (
-              <ProductCard
-                dataCy={`card-produto-${index}`}
-                key={index}
-                onClick={() =>
-                  navigate(`/detalhes-produto/${index}`, {
-                    state: {
-                      produto: {
-                        id_produto: produto.id,
-                        name: produto.nome_produto,
-                        price: produto.valor_venda,
-                        image: produto.url_imagem,
-                        description: produto.descricao,
-                      },
-                    },
-                  })
-                }
-                name={produto.nome_produto}
-                image={produto.url_imagem}
-                price={produto.valor_venda}
-              />
-            ))}
+            {produtos.map((produto, index) => {
+              if (produto.ativo)
+                return (
+                  <ProductCard
+                    dataCy={`card-produto-${index}`}
+                    key={index}
+                    onClick={() =>
+                      navigate(`/detalhes-produto/${produto.id}`, {
+                        state: {
+                          produto: {
+                            id_produto: produto.id,
+                            name: produto.nome_produto,
+                            price: produto.valor_venda,
+                            imagens: produto.imagens,
+                            description: produto.descricao,
+                          },
+                        },
+                      })
+                    }
+                    name={produto.nome_produto}
+                    image={
+                      produto.imagens?.find((imagem) => imagem.principal)
+                        ?.url_imagem
+                    }
+                    price={produto.valor_venda}
+                  />
+                );
+            })}
           </div>
         </div>
       </Card>

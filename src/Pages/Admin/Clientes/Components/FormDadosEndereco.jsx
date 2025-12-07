@@ -61,26 +61,26 @@ const FormDadosEndereco = ({
               maskType={MasksEnum.CEP}
               isCorrect={validacaoCampos.endereco.cep}
               onChange={(value) => handleChange("cep", value)}
-              onBlur={async () => {
-                const cepData = await fetchCepData(novoEndereco.cep);
-                if (cepData.erro) {
-                  setValidacaoCampos({
-                    ...validacaoCampos,
-                    endereco: {
-                      ...validacaoCampos.endereco,
-                      cep: false,
-                    },
-                  });
-                }
-                setNovoEndereco({
-                  ...novoEndereco,
-                  pais: cepData.erro ? "" : "Brasil",
-                  estado: cepData.uf || "",
-                  cidade: cepData.localidade || "",
-                  bairro: cepData.bairro || "",
-                  logradouro: cepData.logradouro || "",
-                });
-              }}
+              // onBlur={async () => {
+              //   const cepData = await fetchCepData(novoEndereco.cep);
+              //   if (cepData.erro) {
+              //     setValidacaoCampos({
+              //       ...validacaoCampos,
+              //       endereco: {
+              //         ...validacaoCampos.endereco,
+              //         cep: false,
+              //       },
+              //     });
+              //   }
+              //   setNovoEndereco({
+              //     ...novoEndereco,
+              //     pais: cepData.erro ? "" : "Brasil",
+              //     estado: cepData.uf || "",
+              //     cidade: cepData.localidade || "",
+              //     bairro: cepData.bairro || "",
+              //     logradouro: cepData.logradouro || "",
+              //   });
+              // }}
             />
           </div>
         </div>

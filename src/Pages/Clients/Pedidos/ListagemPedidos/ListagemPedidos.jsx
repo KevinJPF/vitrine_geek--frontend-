@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../../../Components/Card/Card";
 import { useGetData } from "../../../../Hooks/useGetData";
+import { usePatchData } from "../../../../Hooks/usePatchData";
 import PopupModal from "../../../../Components/PopupModal/PopupModal";
-import { usePostData } from "../../../../Hooks/usePostData";
 
 const ListagemPedidos = () => {
   const { getApiData } = useGetData();
-  const { postApiData } = usePostData();
+  const { patchApiData } = usePatchData();
   const [pedidos, setPedidos] = useState([]);
   const [mostrarPopupTroca, setMostrarPopupTroca] = useState(false);
   const [pedidoParaTroca, setPedidoParaTroca] = useState(null);
@@ -18,6 +18,7 @@ const ListagemPedidos = () => {
 
   const fetchPedidos = async () => {
     const result = await getApiData("pedidos/cliente/1");
+    console.log(result);
     setPedidos(result || []);
   };
 
@@ -98,9 +99,12 @@ const ListagemPedidos = () => {
         return 0;
       };
 
+      console.log("selecionados", selecionados);
       // Monta array de produtos selecionados conforme exigido pela API (inclui id_pedido)
       const produtosPayload = selecionados.map((produtoPayload) => {
-        const produtoSelecionado = pedidoParaTroca.produtos[produtoPayload - 1];
+        const produtoSelecionado = pedidoParaTroca.produtos.find(
+          (p) => p.id == produtoPayload
+        );
 
         const unidadeNum = toNumber(
           produtoSelecionado?.valor_venda ?? produtoSelecionado?.preco ?? 0
@@ -109,7 +113,7 @@ const ListagemPedidos = () => {
         const totalItemRaw = unidadeNum * quantidade;
         const totalItem = Math.round(totalItemRaw * 100) / 100;
         return {
-          produto_id: produtoSelecionado.id,
+          produto_id: produtoSelecionado.produto_id,
           quantidade,
           valor_unitario: Number(unidadeNum.toFixed(2)),
           valor_total: Number(totalItem.toFixed(2)),
@@ -119,7 +123,12 @@ const ListagemPedidos = () => {
       pedidoParaTroca.produtos = produtosPayload;
       pedidoParaTroca.status_id = 6;
 
-      resposta = await postApiData("pedidos", pedidoParaTroca);
+      console.log("pedidoParaTroca", pedidoParaTroca);
+      resposta = await patchApiData(
+        "pedidos/trocar",
+        pedidoParaTroca.id_pedido,
+        pedidoParaTroca
+      );
 
       console.log(resposta);
       if (resposta.campos_invalidos) {
@@ -133,7 +142,10 @@ const ListagemPedidos = () => {
     setMostrarPopupTroca(false);
     setPedidoParaTroca(null);
     setProdutosSelecionados({});
-    fetchPedidos();
+    // aguardar antes de atualizar a lista
+    setTimeout(() => {
+      fetchPedidos();
+    }, 100);
   };
 
   return (
@@ -154,8 +166,9 @@ const ListagemPedidos = () => {
             {pedidos
               .slice()
               .reverse()
-              .map((pedido) => (
+              .map((pedido, index) => (
                 <div
+                  data-cy={`pedido-row-${index}`}
                   key={pedido.id_pedido ?? pedido.id ?? pedido.pedido_id}
                   className="mb-3 rounded overflow-hidden"
                   style={{
@@ -178,6 +191,7 @@ const ListagemPedidos = () => {
                       </div>
                     </div>
                     <div
+                      data-cy={`pedido-status-${index}`}
                       className="row d-flex align-items-center gap-3"
                       style={{ textWrap: "nowrap" }}
                     >
@@ -190,7 +204,10 @@ const ListagemPedidos = () => {
                         </div>
                       </div>
                       {pedido.status_nome === "ENTREGUE" && (
-                        <div className="col">
+                        <div
+                          data-cy={`btn-trocar-pedido-${index}`}
+                          className="col"
+                        >
                           <button
                             className="btn btn-highlight"
                             onClick={() => {
@@ -299,13 +316,14 @@ const ListagemPedidos = () => {
           {!pedidoParaTroca && <div>Nenhum pedido selecionado.</div>}
           {pedidoParaTroca && Array.isArray(pedidoParaTroca.produtos) && (
             <div className="d-flex flex-column gap-2">
-              {pedidoParaTroca.produtos.map((produto) => {
+              {pedidoParaTroca.produtos.map((produto, index) => {
                 const key =
                   produto.id ??
                   produto.produto_id ??
                   `${pedidoParaTroca.id_pedido}_${produto.produto_id}`;
                 return (
                   <label
+                    data-cy={`btn-produto-pedido-${index}`}
                     key={key}
                     className="d-flex align-items-center justify-content-between"
                     style={{
@@ -313,16 +331,23 @@ const ListagemPedidos = () => {
                       backgroundColor: "var(--bg)",
                       borderRadius: 6,
                       border: "1px solid var(--primary)",
+                      cursor: "pointer",
                     }}
                   >
                     <div
-                      style={{ display: "flex", gap: 12, alignItems: "center" }}
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        alignItems: "center",
+                      }}
                     >
                       <input
                         type="checkbox"
+                        className="checkbox-custom"
                         checked={!!produtosSelecionados[key]}
                         onChange={() => toggleProdutoSelecionado(key)}
                       />
+
                       <div>
                         <div className="row">
                           <div className="col-auto">

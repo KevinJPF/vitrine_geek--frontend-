@@ -631,7 +631,7 @@ const RegistrarCliente = () => {
           setNovoEndereco={setNovoEndereco}
           validacaoCampos={validacaoCampos}
           setValidacaoCampos={setValidacaoCampos}
-          fetchCepData={fetchCepData}
+          // fetchCepData={fetchCepData}
         />
       </PopupModal>
 

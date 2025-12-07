@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useGetData } from "../../../Hooks/useGetData";
+import { usePatchData } from "../../../Hooks/usePatchData";
 
 const ListarProdutos = () => {
   const navigate = useNavigate();
+  const { getApiData } = useGetData();
+  const { patchApiData } = usePatchData();
   const [produtos, setProdutos] = useState([
     {
       nome: "Camiseta Geek",
@@ -39,6 +43,12 @@ const ListarProdutos = () => {
     },
   ]);
 
+  const fetchProdutos = async () => {
+    const result = await getApiData("produtos");
+    console.log(result);
+    setProdutos(result);
+  };
+
   const alterarStatusProduto = (produtoParaAlterar) => {
     setProdutos(
       produtos.map((produto) => {
@@ -49,6 +59,7 @@ const ListarProdutos = () => {
   };
 
   useEffect(() => {
+    fetchProdutos();
     const novoProduto = localStorage.getItem("novoProduto");
     const editProduto = localStorage.getItem("editProduto");
     const index = localStorage.getItem("indexProduto");
@@ -94,16 +105,19 @@ const ListarProdutos = () => {
           }}
         >
           <div className="col-2 d-flex justify-content-center">Nome</div>
-          <div className="col-2 d-flex justify-content-center">Categoria</div>
+          <div className="col-1 d-flex justify-content-center">Estoque</div>
+          <div className="col-2 d-flex justify-content-center">
+            Categoria(s)
+          </div>
           <div className="col-3 d-flex justify-content-center">Descrição</div>
-          <div className="col-2 d-flex justify-content-center">Preço</div>
+          <div className="col-1 d-flex justify-content-center">Preço</div>
           <div className="col-1 d-flex justify-content-center">Ativo</div>
           <div className="col-2 d-flex justify-content-center">Ação</div>
         </div>
 
         {/* Corpo da tabela */}
         <div
-          className="col overflow-hidden"
+          className="col overflow-auto"
           style={{
             borderRadius: "0px 0px 16px 16px",
           }}
@@ -120,16 +134,28 @@ const ListarProdutos = () => {
                 }}
               >
                 <div
-                  className="col-2"
+                  className="col-2 text-truncate"
                   style={{ borderRight: "2px solid var(--secondary)" }}
                 >
-                  {produto.nome}
+                  {produto.nome_produto}
+                </div>
+                <div
+                  className="col-1 d-flex text-truncate justify-content-center"
+                  style={{ borderRight: "2px solid var(--secondary)" }}
+                >
+                  {produto.quantidade_disponivel}
                 </div>
                 <div
                   className="col-2"
                   style={{ borderRight: "2px solid var(--secondary)" }}
                 >
-                  {produto.categoria}
+                  {produto.categorias &&
+                    produto.categorias.map((categoria, idx) => (
+                      <span key={idx}>
+                        {idx > 0 ? ", " : ""}
+                        {categoria.nome}
+                      </span>
+                    ))}
                 </div>
                 <div
                   className="col-3 text-truncate"
@@ -139,10 +165,10 @@ const ListarProdutos = () => {
                   {produto.descricao}
                 </div>
                 <div
-                  className="col-2"
+                  className="col-1"
                   style={{ borderRight: "2px solid var(--secondary)" }}
                 >
-                  R$ {produto.preco.toFixed(2)}
+                  R$ {produto.valor_venda}
                 </div>
                 <div
                   className="col-1 d-flex justify-content-center"
@@ -158,7 +184,7 @@ const ListarProdutos = () => {
                     className="btn btn-inverted"
                     onClick={() => {
                       localStorage.setItem("indexProduto", index);
-                      navigate("/registrar-produto", {
+                      navigate(`/admin/registrar-produto/${produto.id}`, {
                         state: { produto },
                       });
                     }}
@@ -169,7 +195,19 @@ const ListarProdutos = () => {
                     className={`btn ${
                       produto.ativo ? "btn-danger" : "btn-green"
                     }`}
-                    onClick={() => alterarStatusProduto(produto)}
+                    onClick={async () => {
+                      if (
+                        (
+                          await patchApiData(
+                            `produtos/${
+                              produto.ativo ? "desativar" : "ativar"
+                            }`,
+                            produto.id
+                          )
+                        ).status === 200
+                      )
+                        alterarStatusProduto(produto);
+                    }}
                   >
                     {produto.ativo ? "Desativar" : "Ativar"}
                   </button>

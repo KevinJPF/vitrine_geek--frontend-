@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { useGetData } from "../../../Hooks/useGetData";
 import { usePostData } from "../../../Hooks/usePostData";
 import { usePutData } from "../../../Hooks/usePutData";
+import toast from "react-hot-toast";
 
 const Carrinho = () => {
   const navigate = useNavigate();
@@ -65,6 +66,12 @@ const Carrinho = () => {
         return;
       }
 
+      if (resposta.status == "erro_quantidade_indisponivel") {
+        console.log(resposta.status);
+        toast.error("Não há mais produtos em estoque.");
+        return;
+      }
+
       const produtoIndex = produtos.findIndex(
         (produto) => produto.produto_id === dadosProduto.produto_id
       );
@@ -108,18 +115,14 @@ const Carrinho = () => {
                     quantity={produto.quantidade}
                     onDelete={() => removeProdutoCarrinho(produto)}
                     onIncreaseQuantity={() => {
-                      if (produto.quantidade < 99)
-                        alteraQuantidadeProduto(
-                          produto,
-                          produto.quantidade + 1
-                        );
+                      alteraQuantidadeProduto(produto, produto.quantidade + 1);
                     }}
                     onDecreaseQuantity={() => {
-                      if (produto.quantidade > 1)
-                        alteraQuantidadeProduto(
-                          produto,
-                          produto.quantidade - 1
-                        );
+                      if (produto.quantidade <= 1) {
+                        toast.error("Não é possível diminuir a quantidade.");
+                        return;
+                      }
+                      alteraQuantidadeProduto(produto, produto.quantidade - 1);
                     }}
                   />
                 ))}
